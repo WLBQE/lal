@@ -34,3 +34,7 @@
 # IDE and OS
 .idea/
 .DS_Store
+
+# CMake
+CMakeLists.txt
+cmake-*
