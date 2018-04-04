@@ -36,5 +36,4 @@
 .DS_Store
 
 # CMake
-CMakeLists.txt
-cmake-*
+cmake-build*

@@ -9,8 +9,9 @@ namespace lal {
     template <typename NumericType, index_t Rows, index_t Cols>
     class matrix {
     public:
-        matrix();
-        ~matrix();
+        auto operator[](index_t idx) {
+            return _base[idx];
+        }
     private:
         std::array<std::array<NumericType, Cols>, Rows> _base;
     };
