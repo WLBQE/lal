@@ -11,5 +11,8 @@ int main()
     std::cout << '\n';
     static_assert(mat[0][1] == 2);
     static_assert(mat.at(0, 1) == 2);
+    lal::matrix<int, 3, 3> mat2(mat);
+    if (mat2 == mat)
+        std::cout << "equal!\n";
     return 0;
 }
