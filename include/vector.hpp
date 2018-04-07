@@ -1,0 +1,4 @@
+#ifndef LAL_VECTOR_HPP
+#define LAL_VECTOR_HPP
+
+#endif //LAL_VECTOR_HPP

@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_MATRIX_HPP
-#define _INCLUDE_MATRIX_HPP
+#ifndef LAL_MATRIX_HPP
+#define LAL_MATRIX_HPP
 
 #include <array>
 
@@ -17,4 +17,4 @@ namespace lal {
     };
 }
 
-#endif
+#endif // LAL_MATRIX_HPP
