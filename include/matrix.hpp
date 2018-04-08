@@ -18,8 +18,6 @@ namespace lal {
 
     template <typename NumericType, index_t Rows, index_t Cols>
     class matrix {
-        static_assert(Rows > 0 && Cols > 0, "matrix dimensions must be positive");
-
         typedef std::array<NumericType, Rows * Cols> base_type;
         base_type _base;
 

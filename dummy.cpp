@@ -27,5 +27,6 @@ int main()
     cci2 += 2;
     cci2 + 5;
     std::cout << cci2 - cci << '\n';
+    lal::matrix<int, 1, 1> maaaat;
     return 0;
 }
