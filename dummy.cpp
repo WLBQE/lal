@@ -28,5 +28,8 @@ int main()
     cci2 + 5;
     std::cout << cci2 - cci << '\n';
     lal::matrix<int, 1, 1> maaaat;
+    constexpr auto ident = lal::make_identity<3>();
+    static_assert(ident[0][0] == 1);
+    static_assert(ident[0][1] == 0);
     return 0;
 }

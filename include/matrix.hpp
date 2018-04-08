@@ -45,9 +45,7 @@ namespace lal {
 
         constexpr explicit matrix(base_type init) noexcept : _base{init} {}
 
-        explicit matrix(const value_type &val) {
-            _base.fill(val);
-        }
+        constexpr explicit matrix(const value_type &val) noexcept;
 
         constexpr pointer operator[](index_t idx) {
             return _base.data() + idx * Cols;
@@ -199,6 +197,12 @@ namespace lal {
             return Rows * Cols == 0;
         }
     };
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr matrix<NumericType, Rows, Cols>::matrix(const value_type &val) noexcept : _base {} {
+        for (size_type i {0}; i < Rows * Cols; ++i)
+            _base[i] = val;
+    }
 
     template <typename NumericType, index_t Rows, index_t Cols>
     class matrix_col_iterator {
@@ -585,6 +589,13 @@ namespace lal {
         return is;
     }
 
+    template <index_t Size, typename NumericType = int>
+    constexpr matrix<NumericType, Size, Size> make_identity(NumericType one = 1, NumericType zero = 0) noexcept {
+        matrix<NumericType, Size, Size> ret(zero);
+        for (index_t i {0}; i < Size; ++i)
+            ret[i][i] = one;
+        return ret;
+    }
 }
 
 #endif // LAL_MATRIX_HPP
