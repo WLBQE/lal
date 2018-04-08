@@ -35,11 +35,11 @@ namespace lal {
             _base.fill(val);
         }
 
-        constexpr value_type *operator[](index_t idx) {
+        constexpr pointer operator[](index_t idx) {
             return _base.data() + idx * Cols;
         }
 
-        constexpr const value_type *operator[](index_t idx) const {
+        constexpr const_pointer operator[](index_t idx) const {
             return _base.data() + idx * Cols;
         }
 
@@ -77,6 +77,30 @@ namespace lal {
 
         constexpr const_iterator cend() const noexcept {
             return _base.cend();
+        }
+
+        constexpr reverse_iterator rbegin() noexcept {
+            return _base.rbegin();
+        }
+
+        constexpr const_reverse_iterator rbegin() const noexcept {
+            return _base.rbegin();
+        }
+
+        constexpr const_reverse_iterator crbegin() const noexcept {
+            return _base.crbegin();
+        }
+
+        constexpr reverse_iterator rend() noexcept {
+            return _base.rend();
+        }
+
+        constexpr const_reverse_iterator rend() const noexcept {
+            return _base.rend();
+        }
+
+        constexpr const_reverse_iterator crend() const noexcept {
+            return _base.crend();
         }
 
         void swap(matrix<NumericType, Rows, Cols> &other) noexcept {
