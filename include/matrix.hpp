@@ -45,7 +45,7 @@ namespace lal {
 
         constexpr explicit matrix(base_type init) noexcept : _base{init} {}
 
-        constexpr explicit matrix(const value_type &val) noexcept;
+        constexpr explicit matrix(const value_type& val) noexcept;
 
         constexpr pointer operator[](index_t idx) {
             return _base.data() + idx * Cols;
@@ -61,7 +61,7 @@ namespace lal {
             return _base[row * Cols + col];
         }
 
-        constexpr const_reference &at(index_t row, index_t col) const {
+        constexpr const_reference at(index_t row, index_t col) const {
             if (row >= Rows || col >= Cols)
                 throw std::out_of_range("index out of range");
             return _base[row * Cols + col];
@@ -181,7 +181,7 @@ namespace lal {
             return const_reverse_col_iterator(col_cbegin());
         }
 
-        void swap(matrix<NumericType, Rows, Cols> &other) noexcept {
+        void swap(matrix<NumericType, Rows, Cols>& other) noexcept {
             this->_base.swap(other._base);
         }
 
@@ -199,8 +199,8 @@ namespace lal {
     };
 
     template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix<NumericType, Rows, Cols>::matrix(const value_type &val) noexcept : _base {} {
-        for (size_type i {0}; i < Rows * Cols; ++i)
+    constexpr matrix<NumericType, Rows, Cols>::matrix(const value_type& val) noexcept : _base{} {
+        for (size_type i{0}; i < Rows * Cols; ++i)
             _base[i] = val;
     }
 
@@ -219,10 +219,10 @@ namespace lal {
         typedef typename _base::reference reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        constexpr matrix_col_iterator() : _row {0}, _col {0}, _ptr {nullptr} {}
+        constexpr matrix_col_iterator() : _row{0}, _col{0}, _ptr{nullptr} {}
 
         constexpr matrix_col_iterator(pointer ptr, index_t row, index_t col) noexcept
-                : _row {row}, _col {col}, _ptr {ptr} {}
+                : _row{row}, _col{col}, _ptr{ptr} {}
 
         constexpr reference operator*() const {
             return *_ptr;
@@ -271,12 +271,12 @@ namespace lal {
         }
 
         constexpr _self operator+(difference_type n) const noexcept {
-            _self tmp {*this};
+            _self tmp{*this};
             return tmp += n;
         }
 
         constexpr _self operator-(difference_type n) const noexcept {
-            _self tmp {*this};
+            _self tmp{*this};
             return tmp -= n;
         }
 
@@ -395,10 +395,10 @@ namespace lal {
         typedef typename _base::const_reference reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        constexpr matrix_const_col_iterator() : _row {0}, _col {0}, _ptr {nullptr} {}
+        constexpr matrix_const_col_iterator() : _row{0}, _col{0}, _ptr{nullptr} {}
 
         constexpr matrix_const_col_iterator(pointer ptr, index_t row, index_t col) noexcept
-                : _row {row}, _col {col}, _ptr {ptr} {}
+                : _row{row}, _col{col}, _ptr{ptr} {}
 
         constexpr reference operator*() const {
             return *_ptr;
@@ -447,12 +447,12 @@ namespace lal {
         }
 
         constexpr _self operator+(difference_type n) const noexcept {
-            _self tmp {*this};
+            _self tmp{*this};
             return tmp += n;
         }
 
         constexpr _self operator-(difference_type n) const noexcept {
-            _self tmp {*this};
+            _self tmp{*this};
             return tmp -= n;
         }
 
@@ -550,7 +550,7 @@ namespace lal {
     template <typename NumericType, index_t Rows, index_t Cols>
     constexpr inline matrix_const_col_iterator<NumericType, Rows, Cols>
     operator+(typename matrix_const_col_iterator<NumericType, Rows, Cols>::difference_type n,
-              matrix_const_col_iterator<NumericType, Rows, Cols> it) noexcept {
+              matrix_const_col_iterator <NumericType, Rows, Cols> it) noexcept {
         return it += n;
     }
 
@@ -568,8 +568,8 @@ namespace lal {
 
     template <typename NumericType, index_t Rows, index_t Cols>
     std::ostream& operator<<(std::ostream& os, const matrix<NumericType, Rows, Cols>& m) {
-        for (index_t i {0}; i < Rows; ++i) {
-            for (index_t j {0}; j < Cols; ++j)
+        for (index_t i{0}; i < Rows; ++i) {
+            for (index_t j{0}; j < Cols; ++j)
                 os << " " << m[i][j];
             os << '\n';
         }
@@ -592,7 +592,7 @@ namespace lal {
     template <index_t Size, typename NumericType = int>
     constexpr matrix<NumericType, Size, Size> make_identity(NumericType one = 1, NumericType zero = 0) noexcept {
         matrix<NumericType, Size, Size> ret(zero);
-        for (index_t i {0}; i < Size; ++i)
+        for (index_t i{0}; i < Size; ++i)
             ret[i][i] = one;
         return ret;
     }
