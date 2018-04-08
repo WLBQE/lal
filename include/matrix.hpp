@@ -54,82 +54,83 @@ namespace lal {
         constexpr const_pointer operator[](index_t idx) const {
             return _base.data() + idx * Cols;
         }
-        
-        matrix<NumericType, Rows, Cols>& operator+=(const matrix<NumericType, Rows, Cols>& m){
-            for(index_t i = 0; i < Rows; ++i){
-                for(index_t j = 0; j < Cols; ++j){
-                    _base[i*Cols+j] = _base[i*Cols+j]+m._base[i+Cols+j];
+
+        matrix<NumericType, Rows, Cols>& operator+=(const matrix<NumericType, Rows, Cols>& m) {
+            for (index_t i = 0; i < Rows; ++i) {
+                for (index_t j = 0; j < Cols; ++j) {
+                    _base[i * Cols + j] = _base[i * Cols + j] + m._base[i + Cols + j];
                 }
             }
             return *this;
         }
-        
-        matrix<NumericType, Rows, Cols>& operator-=(const matrix<NumericType, Rows, Cols>& m){
-            for(index_t i = 0; i < Rows; ++i){
-                for(index_t j = 0; j < Cols; ++j){
-                    _base[i*Cols+j] = _base[i*Cols+j]-m._base[i*Cols+j];
+
+        matrix<NumericType, Rows, Cols>& operator-=(const matrix<NumericType, Rows, Cols>& m) {
+            for (index_t i = 0; i < Rows; ++i) {
+                for (index_t j = 0; j < Cols; ++j) {
+                    _base[i * Cols + j] = _base[i * Cols + j] - m._base[i * Cols + j];
                 }
             }
             return *this;
         }
-        
-        template<index_t ColOther>
-        matrix<NumericType, Rows, Cols>& operator*=(const matrix<NumericType, Cols, ColOther>& m){
+
+        template <index_t ColOther>
+        matrix<NumericType, Rows, Cols>& operator*=(const matrix<NumericType, Cols, ColOther>& m) {
             matrix<NumericType, Rows, ColOther> buffer{};
             for (index_t i = 0; i < Rows; ++i) {
                 for (index_t j = 0; j < ColOther; ++j) {
-                    for(index_t k = 0; k < Cols; ++k){
-                        buffer._base[i*ColOther+j] += _base[i*Cols+k]*m._base[k*ColOther+j];
+                    for (index_t k = 0; k < Cols; ++k) {
+                        buffer._base[i * ColOther + j] += _base[i * Cols + k] * m._base[k * ColOther + j];
                     }
                 }
             }
             return buffer;
         }
-        
-        matrix<NumericType, Rows, Cols>& operator*=(double number){
-            for(index_t i = 0; i < Rows; ++i){
-                for(index_t j = 0; j < Cols; ++j){
-                    _base[i*Cols+j] = _base[i*Cols+j]*number;
+
+        matrix<NumericType, Rows, Cols>& operator*=(double number) {
+            for (index_t i = 0; i < Rows; ++i) {
+                for (index_t j = 0; j < Cols; ++j) {
+                    _base[i * Cols + j] = _base[i * Cols + j] * number;
                 }
             }
         }
-        matrix<NumericType, Rows, Cols>& operator/=(double number){
-            for(index_t i = 0; i < Rows; ++i){
-                for(index_t j = 0; j < Cols; ++j){
-                    _base[i*Cols+j] = _base[i*Cols+j]/number;
+
+        matrix<NumericType, Rows, Cols>& operator/=(double number) {
+            for (index_t i = 0; i < Rows; ++i) {
+                for (index_t j = 0; j < Cols; ++j) {
+                    _base[i * Cols + j] = _base[i * Cols + j] / number;
                 }
             }
         }
-        
-        matrix<NumericType, Rows, Cols> createIdentity(){
+
+        matrix<NumericType, Rows, Cols> createIdentity() {
             matrix<NumericType, Rows, Cols> buffer{};
-            
-            for(index_t i = 0; i < Rows; i++){
-                for(index_t j = 0; j < Cols; j++){
-                    if(i==j)
-                        buffer._base[i*Cols+j] = 1;
+
+            for (index_t i = 0; i < Rows; i++) {
+                for (index_t j = 0; j < Cols; j++) {
+                    if (i == j)
+                        buffer._base[i * Cols + j] = 1;
                     else
-                        buffer._base[i*Cols+j] = 0;
+                        buffer._base[i * Cols + j] = 0;
                 }
             }
             return buffer;
         }
-        
-        matrix<NumericType, Rows, Cols> powerHelper(const matrix<NumericType, Rows, Cols>& m, int magnitude){
-            
-            if(magnitude == 0){
+
+        matrix<NumericType, Rows, Cols> powerHelper(const matrix<NumericType, Rows, Cols>& m, int magnitude) {
+
+            if (magnitude == 0) {
                 return createIdentity();
-            }else if(magnitude == 1){
+            } else if (magnitude == 1) {
                 return m;
-            }else if(magnitude%2==0){
-                return powerHelper(m*m, magnitude/2);
-            }else{
-                return powerHelper(m*m, (magnitude-1)/2)*m;
+            } else if (magnitude % 2 == 0) {
+                return powerHelper(m * m, magnitude / 2);
+            } else {
+                return powerHelper(m * m, (magnitude - 1) / 2) * m;
             }
-            
+
         }
-        
-        matrix<NumericType, Rows, Cols>  operator ^(int magnitude){
+
+        matrix<NumericType, Rows, Cols> operator^(int magnitude) {
             matrix<NumericType, Rows, Cols> buffer(*this);
             return powerHelper(buffer, magnitude);
         }
@@ -667,42 +668,44 @@ namespace lal {
         }
         return is;
     }
-            
+
     template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator+(matrix<NumericType, Rows, Cols>& m1,  matrix<NumericType, Rows, Cols>& m2){
+    matrix<NumericType, Rows, Cols>
+    operator+(matrix<NumericType, Rows, Cols>& m1, matrix<NumericType, Rows, Cols>& m2) {
         matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer+=m2;
-    }
-    
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator-(const matrix<NumericType, Rows, Cols>& m1, const matrix<NumericType, Rows, Cols>& m2){
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer-=m2;
-    }
-    
-    template <typename NumericType, index_t Rows, index_t Cols, index_t ColOther>
-    matrix<NumericType, Rows, Cols> operator*(const matrix<NumericType, Rows, Cols>& m1, const matrix<NumericType, Cols, ColOther>& m2){
-        matrix<NumericType, Rows, ColOther> buffer(m1);
-        return buffer*=m2;
-    }
-    
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator*(const matrix<NumericType, Rows, Cols>& m1, double number){
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer*=number;
-    }
-    
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator*(double number, const matrix<NumericType, Rows, Cols>& m1){
-        return number*m1;
-    }
-    
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator/(const matrix<NumericType, Rows, Cols>& m1, double number){
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer/=number;
+        return buffer += m2;
     }
 
+    template <typename NumericType, index_t Rows, index_t Cols>
+    matrix<NumericType, Rows, Cols>
+    operator-(const matrix<NumericType, Rows, Cols>& m1, const matrix<NumericType, Rows, Cols>& m2) {
+        matrix<NumericType, Rows, Cols> buffer(m1);
+        return buffer -= m2;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols, index_t ColOther>
+    matrix<NumericType, Rows, Cols>
+    operator*(const matrix<NumericType, Rows, Cols>& m1, const matrix<NumericType, Cols, ColOther>& m2) {
+        matrix<NumericType, Rows, ColOther> buffer(m1);
+        return buffer *= m2;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    matrix<NumericType, Rows, Cols> operator*(const matrix<NumericType, Rows, Cols>& m1, double number) {
+        matrix<NumericType, Rows, Cols> buffer(m1);
+        return buffer *= number;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    matrix<NumericType, Rows, Cols> operator*(double number, const matrix<NumericType, Rows, Cols>& m1) {
+        return number * m1;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    matrix<NumericType, Rows, Cols> operator/(const matrix<NumericType, Rows, Cols>& m1, double number) {
+        matrix<NumericType, Rows, Cols> buffer(m1);
+        return buffer /= number;
+    }
 
     template <index_t Size, typename NumericType = int>
     constexpr matrix<NumericType, Size, Size> make_identity(NumericType one = 1, NumericType zero = 0) noexcept {
