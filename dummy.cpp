@@ -12,11 +12,13 @@ int main()
     if (mat2 == mat)
         std::cout << "equal!\n";
     lal::matrix<int, 3, 3> mat3(222);
-    //std::cin >> mat3;
     std::cout << mat3;
     mat3[0][0] = 1;
     std::cout << mat3;
-    std::cin >> mat3;
+    //std::cin >> mat3;
     std::cout << mat3;
+    lal::matrix<int, 32, 32>::col_iterator ci;
+    auto ci2 = 3332 + ci;
+    std::cout << ci2 - ci << '\n';
     return 0;
 }
