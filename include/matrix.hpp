@@ -1,14 +1,14 @@
 #ifndef LAL_MATRIX_HPP
 #define LAL_MATRIX_HPP
 
+#include <algorithm>
 #include <array>
 #include <iterator>
-#include <algorithm>
 
 namespace lal {
     typedef std::size_t index_t;
 
-    template<typename NumericType, index_t Rows, index_t Cols>
+    template <typename NumericType, index_t Rows, index_t Cols>
     class matrix {
         typedef std::array<NumericType, Rows * Cols> base_type;
         base_type _base;
@@ -122,33 +122,35 @@ namespace lal {
         class column_iterator;
     };
 
-    template<typename NumericType, index_t Rows, index_t Cols>
-    inline bool operator==(const matrix<NumericType, Rows, Cols> &lhs, const matrix<NumericType, Rows, Cols> &rhs) {
+    template <typename NumericType, index_t Rows, index_t Cols>
+    inline bool operator==(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template<typename NumericType, index_t Rows, index_t Cols>
-    inline bool operator!=(const matrix<NumericType, Rows, Cols> &lhs, const matrix<NumericType, Rows, Cols> &rhs) {
+    template <typename NumericType, index_t Rows, index_t Cols>
+    inline bool operator!=(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
         return !(lhs == rhs);
     }
 
-    template<typename NumericType, index_t _Rows, index_t _Cols>
-    std::ostream &operator<<(std::ostream &os, const matrix<NumericType, _Rows, _Cols> &m) {
-        for (index_t i = 0; i < _Rows; ++i) {
-            for (index_t j = 0; j < _Cols; ++j) {
+    template <typename NumericType, index_t Rows, index_t Cols>
+    std::ostream& operator<<(std::ostream& os, const matrix<NumericType, Rows, Cols>& m) {
+        for (index_t i {0}; i < Rows; ++i) {
+            for (index_t j {0}; j < Cols; ++j)
                 os << " " << m[i][j];
-            }
-            os << std::endl;
+            os << '\n';
         }
         return os;
     }
 
-    template<typename NumericType, index_t _Rows, index_t _Cols>
-    std::istream &operator>>(std::istream &is, const matrix<NumericType, _Rows, _Cols> &m) {
-        for (index_t i = 0; i < _Rows; ++i) {
-            for (index_t j = 0; j < _Cols; ++j) {
-                is >> m[i][j];
-            }
+    template <typename NumericType, index_t Rows, index_t Cols>
+    std::istream& operator>>(std::istream& is, matrix<NumericType, Rows, Cols>& m) {
+        for (auto& val : m) {
+            NumericType tmp;
+            is >> tmp;
+            if (is.good())
+                val = tmp;
+            else
+                break;
         }
         return is;
     }
