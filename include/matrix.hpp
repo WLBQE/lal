@@ -118,6 +118,72 @@ namespace lal {
             return _base.crend();
         }
 
+        constexpr col_iterator col_begin() noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base.data(), 0, 0);
+            else
+                return begin();
+        }
+
+        constexpr const_col_iterator col_begin() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data(), 0, 0);
+            else
+                return begin();
+        }
+
+        constexpr const_col_iterator col_cbegin() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data(), 0, 0);
+            else
+                return cbegin();
+        }
+
+        constexpr col_iterator col_end() noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base.data() + Rows * Cols, Rows - 1, Cols - 1);
+            else
+                return end();
+        }
+
+        constexpr const_col_iterator col_end() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data() + Rows * Cols, Rows - 1, Cols - 1);
+            else
+                return end();
+        }
+
+        constexpr const_col_iterator col_cend() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data() + Rows * Cols, Rows - 1, Cols - 1);
+            else
+                return cend();
+        }
+
+        constexpr reverse_col_iterator col_rbegin() noexcept {
+            return reverse_col_iterator(col_end());
+        }
+
+        constexpr const_reverse_col_iterator col_rbegin() const noexcept {
+            return const_reverse_col_iterator(col_end());
+        }
+
+        constexpr const_reverse_col_iterator col_crbegin() const noexcept {
+            return const_reverse_col_iterator(col_cend());
+        }
+
+        constexpr reverse_col_iterator col_rend() noexcept {
+            return reverse_col_iterator(col_begin());
+        }
+
+        constexpr const_reverse_col_iterator col_rend() const noexcept {
+            return const_reverse_col_iterator(col_begin());
+        }
+
+        constexpr const_reverse_col_iterator col_crend() const noexcept {
+            return const_reverse_col_iterator(col_cbegin());
+        }
+
         void swap(matrix<NumericType, Rows, Cols> &other) noexcept {
             this->_base.swap(other._base);
         }
@@ -150,106 +216,104 @@ namespace lal {
         typedef typename _base::reference reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        constexpr matrix_col_iterator() : _ptr {nullptr}, _row {0}, _col {0} {}
+        constexpr matrix_col_iterator() : _row {0}, _col {0}, _ptr {nullptr} {}
 
         constexpr matrix_col_iterator(pointer ptr, index_t row, index_t col) noexcept
-                : _ptr {ptr}, _row {row}, _col {col} {}
+                : _row {row}, _col {col}, _ptr {ptr} {}
 
-        reference operator*() const {
+        constexpr reference operator*() const {
             return *_ptr;
         }
 
-        pointer operator->() const noexcept {
+        constexpr pointer operator->() const noexcept {
             return _ptr;
         }
 
-        _self& operator++() noexcept {
-            if (_row + 1 == Rows) {
-                _row = 0;
-                ++_col;
-                _ptr -= (Rows - 1) * Cols - 1;
-            } else {
-                ++_row;
-                _ptr += Cols;
-            }
-            return *this;
-        };
+        constexpr _self& operator++() noexcept;
 
-        const _self operator++(int) noexcept {
+        constexpr const _self operator++(int) noexcept {
             _self tmp = *this;
             ++*this;
             return tmp;
         }
 
-        _self& operator--() noexcept {
-            if (_row == 0) {
-                _row = Rows - 1;
-                --_col;
-                _ptr += (Rows - 1) * Cols - 1;
-            }
-            return *this;
-        };
+        constexpr _self& operator--() noexcept;
 
-        const _self operator--(int) noexcept {
+        constexpr const _self operator--(int) noexcept {
             _self tmp = *this;
             --*this;
             return tmp;
         }
 
-        bool operator==(const _self& rhs) const noexcept {
+        constexpr bool operator==(const _self& rhs) const noexcept {
             return _ptr == rhs._ptr && _row == rhs._row && _col == rhs._col;
         }
 
-        bool operator==(const _const_it& rhs) const noexcept {
-            // TODO: implement
-            return false;
+        constexpr bool operator==(const _const_it& rhs) const noexcept {
+            return _ptr == rhs._ptr && _row == rhs._row && _col == rhs._col;
         }
 
-        bool operator!=(const _self& rhs) const noexcept {
+        constexpr bool operator!=(const _self& rhs) const noexcept {
             return !(*this == rhs);
         }
 
-        bool operator!=(const _const_it& rhs) const noexcept {
+        constexpr bool operator!=(const _const_it& rhs) const noexcept {
             return !(*this == rhs);
         }
 
-        _self& operator+=(difference_type n) noexcept;
+        constexpr _self& operator+=(difference_type n) noexcept;
 
-        _self& operator-=(difference_type n) noexcept {
+        constexpr _self& operator-=(difference_type n) noexcept {
             return *this += -n;
         }
 
-        _self operator+(difference_type n) const noexcept {
+        constexpr _self operator+(difference_type n) const noexcept {
             _self tmp {*this};
             return tmp += n;
         }
 
-        _self operator-(difference_type n) const noexcept {
+        constexpr _self operator-(difference_type n) const noexcept {
             _self tmp {*this};
             return tmp -= n;
         }
 
-        difference_type operator-(const _self& other) const noexcept {
+        constexpr difference_type operator-(const _self& other) const noexcept {
             return (_col - other._col) * Rows + _row - other._row;
         }
 
-        reference operator[](difference_type n) const {
+        constexpr reference operator[](difference_type n) const {
             return *(*this + n);
         }
 
-        bool operator<(const _self& rhs) const noexcept {
+        constexpr bool operator<(const _self& rhs) const noexcept {
             return _col == rhs._col ? _row < rhs._row : _col < rhs._col;
         }
 
-        bool operator>(const _self& rhs) const noexcept {
+        constexpr bool operator<(const _const_it& rhs) const noexcept {
+            return _col == rhs._col ? _row < rhs._row : _col < rhs._col;
+        }
+
+        constexpr bool operator>(const _self& rhs) const noexcept {
             return rhs < *this;
         }
 
-        bool operator<=(const _self& rhs) const noexcept {
+        constexpr bool operator>(const _const_it& rhs) const noexcept {
+            return rhs < *this;
+        }
+
+        constexpr bool operator<=(const _self& rhs) const noexcept {
             return _col == rhs._col ? _row <= rhs._row : _col < rhs._col;
         }
 
-        bool operator>=(const _self& rhs) const noexcept {
+        constexpr bool operator<=(const _const_it& rhs) const noexcept {
+            return _col == rhs._col ? _row <= rhs._row : _col < rhs._col;
+        }
+
+        constexpr bool operator>=(const _self& rhs) const noexcept {
+            return rhs <= *this;
+        }
+
+        constexpr bool operator>=(const _const_it& rhs) const noexcept {
             return rhs <= *this;
         }
 
@@ -260,7 +324,35 @@ namespace lal {
     };
 
     template <typename NumericType, index_t Rows, index_t Cols>
-    matrix_col_iterator<NumericType, Rows, Cols>&
+    constexpr matrix_col_iterator<NumericType, Rows, Cols>&
+    matrix_col_iterator<NumericType, Rows, Cols>::operator++() noexcept {
+        if (_row + 1 == Rows) {
+            _row = 0;
+            ++_col;
+            _ptr -= (Rows - 1) * Cols - 1;
+        } else {
+            ++_row;
+            _ptr += Cols;
+        }
+        return *this;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr matrix_col_iterator<NumericType, Rows, Cols>&
+    matrix_col_iterator<NumericType, Rows, Cols>::operator--() noexcept {
+        if (_row == 0) {
+            _row = Rows - 1;
+            --_col;
+            _ptr += (Rows - 1) * Cols - 1;
+        } else {
+            --_row;
+            _ptr -= Cols;
+        }
+        return *this;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr matrix_col_iterator<NumericType, Rows, Cols>&
     matrix_col_iterator<NumericType, Rows, Cols>::operator+=(
             matrix_col_iterator<NumericType, Rows, Cols>::difference_type n
     ) noexcept {
@@ -274,27 +366,200 @@ namespace lal {
         }
         _ptr += _row * Cols + _col;
         return *this;
-    };
+    }
 
     template <typename NumericType, index_t Rows, index_t Cols>
-    inline matrix_col_iterator<NumericType, Rows, Cols>
+    constexpr inline matrix_col_iterator<NumericType, Rows, Cols>
     operator+(typename matrix_col_iterator<NumericType, Rows, Cols>::difference_type n,
               matrix_col_iterator<NumericType, Rows, Cols> it) noexcept {
         return it += n;
-    };
+    }
 
     template <typename NumericType, index_t Rows, index_t Cols>
     class matrix_const_col_iterator {
         static_assert(Rows > 1 && Cols > 1, "invalid dimension");
+
+        typedef matrix<NumericType, Rows, Cols> _base;
+        typedef matrix_const_col_iterator<NumericType, Rows, Cols> _self;
+        typedef matrix_col_iterator<NumericType, Rows, Cols> _it;
+
+        friend class matrix_col_iterator<NumericType, Rows, Cols>;
+
+    public:
+        typedef typename _base::difference_type difference_type;
+        typedef typename _base::value_type value_type;
+        typedef typename _base::const_pointer pointer;
+        typedef typename _base::const_reference reference;
+        typedef std::random_access_iterator_tag iterator_category;
+
+        constexpr matrix_const_col_iterator() : _row {0}, _col {0}, _ptr {nullptr} {}
+
+        constexpr matrix_const_col_iterator(pointer ptr, index_t row, index_t col) noexcept
+                : _row {row}, _col {col}, _ptr {ptr} {}
+
+        constexpr reference operator*() const {
+            return *_ptr;
+        }
+
+        constexpr pointer operator->() const noexcept {
+            return _ptr;
+        }
+
+        constexpr _self& operator++() noexcept;
+
+        constexpr const _self operator++(int) noexcept {
+            _self tmp = *this;
+            ++*this;
+            return tmp;
+        }
+
+        constexpr _self& operator--() noexcept;
+
+        constexpr const _self operator--(int) noexcept {
+            _self tmp = *this;
+            --*this;
+            return tmp;
+        }
+
+        constexpr bool operator==(const _self& rhs) const noexcept {
+            return _ptr == rhs._ptr && _row == rhs._row && _col == rhs._col;
+        }
+
+        constexpr bool operator==(const _it& rhs) const noexcept {
+            return rhs == *this;
+        }
+
+        constexpr bool operator!=(const _self& rhs) const noexcept {
+            return !(*this == rhs);
+        }
+
+        constexpr bool operator!=(const _it& rhs) const noexcept {
+            return !(*this == rhs);
+        }
+
+        constexpr _self& operator+=(difference_type n) noexcept;
+
+        constexpr _self& operator-=(difference_type n) noexcept {
+            return *this += -n;
+        }
+
+        constexpr _self operator+(difference_type n) const noexcept {
+            _self tmp {*this};
+            return tmp += n;
+        }
+
+        constexpr _self operator-(difference_type n) const noexcept {
+            _self tmp {*this};
+            return tmp -= n;
+        }
+
+        constexpr difference_type operator-(const _self& other) const noexcept {
+            return (_col - other._col) * Rows + _row - other._row;
+        }
+
+        constexpr reference operator[](difference_type n) const {
+            return *(*this + n);
+        }
+
+        constexpr bool operator<(const _self& rhs) const noexcept {
+            return _col == rhs._col ? _row < rhs._row : _col < rhs._col;
+        }
+
+        constexpr bool operator<(const _it& rhs) const noexcept {
+            return rhs > *this;
+        }
+
+        constexpr bool operator>(const _self& rhs) const noexcept {
+            return rhs < *this;
+        }
+
+        constexpr bool operator>(const _it& rhs) const noexcept {
+            return rhs < *this;
+        }
+
+        constexpr bool operator<=(const _self& rhs) const noexcept {
+            return _col == rhs._col ? _row <= rhs._row : _col < rhs._col;
+        }
+
+        constexpr bool operator<=(const _it& rhs) const noexcept {
+            return rhs >= *this;
+        }
+
+        constexpr bool operator>=(const _self& rhs) const noexcept {
+            return rhs <= *this;
+        }
+
+        constexpr bool operator>=(const _it& rhs) const noexcept {
+            return rhs <= *this;
+        }
+
+    private:
+        index_t _row;
+        index_t _col;
+        pointer _ptr;
     };
 
     template <typename NumericType, index_t Rows, index_t Cols>
-    inline bool operator==(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
+    constexpr matrix_const_col_iterator<NumericType, Rows, Cols>&
+    matrix_const_col_iterator<NumericType, Rows, Cols>::operator++() noexcept {
+        if (_row + 1 == Rows) {
+            _row = 0;
+            ++_col;
+            _ptr -= (Rows - 1) * Cols - 1;
+        } else {
+            ++_row;
+            _ptr += Cols;
+        }
+        return *this;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr matrix_const_col_iterator<NumericType, Rows, Cols>&
+    matrix_const_col_iterator<NumericType, Rows, Cols>::operator--() noexcept {
+        if (_row == 0) {
+            _row = Rows - 1;
+            --_col;
+            _ptr += (Rows - 1) * Cols - 1;
+        } else {
+            --_row;
+            _ptr -= Cols;
+        }
+        return *this;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr matrix_const_col_iterator<NumericType, Rows, Cols>&
+    matrix_const_col_iterator<NumericType, Rows, Cols>::operator+=(
+            matrix_const_col_iterator<NumericType, Rows, Cols>::difference_type n
+    ) noexcept {
+        _ptr -= _row * Cols + _col;
+        auto old_row = _row;
+        _row = (_row + n) % Rows;
+        _col += (old_row + n) / Rows;
+        if (_row < 0) {
+            _row += Rows;
+            --_col;
+        }
+        _ptr += _row * Cols + _col;
+        return *this;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr inline matrix_const_col_iterator<NumericType, Rows, Cols>
+    operator+(typename matrix_const_col_iterator<NumericType, Rows, Cols>::difference_type n,
+              matrix_const_col_iterator<NumericType, Rows, Cols> it) noexcept {
+        return it += n;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols>
+    constexpr inline bool
+    operator==(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     template <typename NumericType, index_t Rows, index_t Cols>
-    inline bool operator!=(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
+    constexpr inline bool
+    operator!=(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
         return !(lhs == rhs);
     }
 

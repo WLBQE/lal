@@ -18,7 +18,14 @@ int main()
     //std::cin >> mat3;
     std::cout << mat3;
     lal::matrix<int, 32, 32>::col_iterator ci;
+    lal::matrix<int, 32, 32>::const_col_iterator cci;
+    if (ci == cci && cci == ci)
+        std::cout << "Equal again!\n";
     auto ci2 = 3332 + ci;
     std::cout << ci2 - ci << '\n';
+    auto cci2 = cci;
+    cci2 += 2;
+    cci2 + 5;
+    std::cout << cci2 - cci << '\n';
     return 0;
 }
