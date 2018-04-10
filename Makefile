@@ -1,4 +1,4 @@
-CXX=g++-7
+CXX=clang++
 CXXFLAGS=-std=c++17 -O2 -Wall -Wextra -pedantic
 
 dummy: dummy.cpp include/matrix.hpp

@@ -3,49 +3,78 @@
 
 #include <algorithm>
 #include <array>
+#include <memory>
 #include <iostream>
 #include <iterator>
 #include <type_traits>
 
 namespace lal {
+    constexpr static std::size_t _stack_threshold {0x100};
+
     typedef std::size_t index_t;
 
-    template <typename NumericType, index_t Rows, index_t Cols>
+    template <typename NumericType, index_t Rows, index_t Cols,
+            bool OnStack = Rows * Cols * sizeof(NumericType) < _stack_threshold>
     class matrix_col_iterator;
 
-    template <typename NumericType, index_t Rows, index_t Cols>
+    template <typename NumericType, index_t Rows, index_t Cols,
+            bool OnStack = Rows * Cols * sizeof(NumericType) < _stack_threshold>
     class matrix_const_col_iterator;
 
+    template <typename NumericType, index_t Rows, index_t Cols,
+            bool OnStack = Rows * Cols * sizeof(NumericType) < _stack_threshold>
+    class matrix;
+
+    template <typename NumericType1, typename NumericType2,
+            index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
+    constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
+    operator*(matrix<NumericType1, Rows1, Cols1, OnStack1>& m1, matrix<NumericType2, Cols1, Cols2, OnStack2>& m2);
+
     template <typename NumericType, index_t Rows, index_t Cols>
-    class matrix {
-        typedef std::array<NumericType, Rows * Cols> base_type;
-        base_type _base;
+    class matrix<NumericType, Rows, Cols, true> {
+        typedef std::array<NumericType, Rows * Cols> _base_type;
+        typedef matrix<NumericType, Rows, Cols, true> _self;
+
+        _base_type _base;
 
     public:
-        typedef typename base_type::value_type value_type;
-        typedef typename base_type::pointer pointer;
-        typedef typename base_type::const_pointer const_pointer;
-        typedef typename base_type::reference reference;
-        typedef typename base_type::const_reference const_reference;
-        typedef typename base_type::iterator iterator;
-        typedef typename base_type::const_iterator const_iterator;
-        typedef typename base_type::reverse_iterator reverse_iterator;
-        typedef typename base_type::const_reverse_iterator const_reverse_iterator;
-        typedef typename base_type::difference_type difference_type;
-        typedef typename base_type::size_type size_type;
+        typedef typename _base_type::value_type value_type;
+        typedef typename _base_type::pointer pointer;
+        typedef typename _base_type::const_pointer const_pointer;
+        typedef typename _base_type::reference reference;
+        typedef typename _base_type::const_reference const_reference;
+        typedef typename _base_type::iterator iterator;
+        typedef typename _base_type::const_iterator const_iterator;
+        typedef typename _base_type::reverse_iterator reverse_iterator;
+        typedef typename _base_type::const_reverse_iterator const_reverse_iterator;
+        typedef typename _base_type::difference_type difference_type;
+        typedef typename _base_type::size_type size_type;
 
-        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_col_iterator<NumericType, Rows, Cols>, iterator>
-                col_iterator;
-        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_const_col_iterator<NumericType, Rows, Cols>,
+        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_col_iterator<NumericType, Rows, Cols, true>,
+                iterator> col_iterator;
+        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_const_col_iterator<NumericType, Rows, Cols, true>,
                 const_iterator> const_col_iterator;
         typedef std::reverse_iterator<col_iterator> reverse_col_iterator;
         typedef std::reverse_iterator<const_col_iterator> const_reverse_col_iterator;
 
-        constexpr matrix() : _base{} {}
+        constexpr matrix() : _base {} {}
 
-        constexpr explicit matrix(base_type init) noexcept : _base{init} {}
+        constexpr explicit matrix(_base_type init) noexcept : _base {init} {}
 
         constexpr explicit matrix(const value_type& val) noexcept;
+
+        operator matrix<NumericType, Rows, Cols, false>() const {
+            return matrix<NumericType, Rows, Cols, false> {_base};
+        }
+
+        template <typename NumericType2, bool OnStack2>
+        operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
+            matrix<NumericType2, Rows, Cols, OnStack2> ret;
+            std::transform(begin(), end(), ret.begin(), [](const value_type& val) -> NumericType2 {
+                return val;
+            });
+            return ret;
+        }
 
         constexpr pointer operator[](index_t idx) {
             return _base.data() + idx * Cols;
@@ -53,86 +82,6 @@ namespace lal {
 
         constexpr const_pointer operator[](index_t idx) const {
             return _base.data() + idx * Cols;
-        }
-
-        matrix<NumericType, Rows, Cols>& operator+=(const matrix<NumericType, Rows, Cols>& m) {
-            for (index_t i = 0; i < Rows; ++i) {
-                for (index_t j = 0; j < Cols; ++j) {
-                    _base[i * Cols + j] = _base[i * Cols + j] + m._base[i + Cols + j];
-                }
-            }
-            return *this;
-        }
-
-        matrix<NumericType, Rows, Cols>& operator-=(const matrix<NumericType, Rows, Cols>& m) {
-            for (index_t i = 0; i < Rows; ++i) {
-                for (index_t j = 0; j < Cols; ++j) {
-                    _base[i * Cols + j] = _base[i * Cols + j] - m._base[i * Cols + j];
-                }
-            }
-            return *this;
-        }
-
-        template <index_t ColOther>
-        matrix<NumericType, Rows, Cols>& operator*=(const matrix<NumericType, Cols, ColOther>& m) {
-            matrix<NumericType, Rows, ColOther> buffer{};
-            for (index_t i = 0; i < Rows; ++i) {
-                for (index_t j = 0; j < ColOther; ++j) {
-                    for (index_t k = 0; k < Cols; ++k) {
-                        buffer._base[i * ColOther + j] += _base[i * Cols + k] * m._base[k * ColOther + j];
-                    }
-                }
-            }
-            return buffer;
-        }
-
-        matrix<NumericType, Rows, Cols>& operator*=(double number) {
-            for (index_t i = 0; i < Rows; ++i) {
-                for (index_t j = 0; j < Cols; ++j) {
-                    _base[i * Cols + j] = _base[i * Cols + j] * number;
-                }
-            }
-        }
-
-        matrix<NumericType, Rows, Cols>& operator/=(double number) {
-            for (index_t i = 0; i < Rows; ++i) {
-                for (index_t j = 0; j < Cols; ++j) {
-                    _base[i * Cols + j] = _base[i * Cols + j] / number;
-                }
-            }
-        }
-
-        matrix<NumericType, Rows, Cols> createIdentity() {
-            matrix<NumericType, Rows, Cols> buffer{};
-
-            for (index_t i = 0; i < Rows; i++) {
-                for (index_t j = 0; j < Cols; j++) {
-                    if (i == j)
-                        buffer._base[i * Cols + j] = 1;
-                    else
-                        buffer._base[i * Cols + j] = 0;
-                }
-            }
-            return buffer;
-        }
-
-        matrix<NumericType, Rows, Cols> powerHelper(const matrix<NumericType, Rows, Cols>& m, int magnitude) {
-
-            if (magnitude == 0) {
-                return createIdentity();
-            } else if (magnitude == 1) {
-                return m;
-            } else if (magnitude % 2 == 0) {
-                return powerHelper(m * m, magnitude / 2);
-            } else {
-                return powerHelper(m * m, (magnitude - 1) / 2) * m;
-            }
-
-        }
-
-        matrix<NumericType, Rows, Cols> operator^(int magnitude) {
-            matrix<NumericType, Rows, Cols> buffer(*this);
-            return powerHelper(buffer, magnitude);
         }
 
         constexpr reference at(index_t row, index_t col) {
@@ -261,7 +210,7 @@ namespace lal {
             return const_reverse_col_iterator(col_cbegin());
         }
 
-        void swap(matrix<NumericType, Rows, Cols>& other) noexcept {
+        void swap(_self& other) noexcept {
             this->_base.swap(other._base);
         }
 
@@ -276,21 +225,293 @@ namespace lal {
         constexpr bool empty() const noexcept {
             return Rows * Cols == 0;
         }
+
+        template <typename NumericType2, bool OnStack2>
+        constexpr _self& operator+=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
+            std::transform(begin(), end(), m.begin(), begin(),
+                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
+            return *this;
+        }
+
+        template <typename NumericType2, bool OnStack2>
+        constexpr _self& operator-=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
+            std::transform(begin(), end(), m.begin(), begin(),
+                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a * b; });
+            return *this;
+        }
+
+        template <typename NumericType2>
+        constexpr _self& operator*=(const NumericType2& number) {
+            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+                return a * number;
+            });
+            return *this;
+        }
+
+        template <typename NumericType2>
+        constexpr _self& operator/=(const NumericType2& number) {
+            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+                return a / number;
+            });
+            return *this;
+        }
+
+        template <typename NumericType2, bool OnStack2, typename = std::enable_if_t<Rows == Cols, NumericType2>>
+        constexpr _self& operator*=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
+            *this = *this * m;
+            return *this;
+        }
     };
 
     template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix<NumericType, Rows, Cols>::matrix(const value_type& val) noexcept : _base{} {
-        for (size_type i{0}; i < Rows * Cols; ++i)
-            _base[i] = val;
+    constexpr matrix<NumericType, Rows, Cols, true>::matrix(const value_type& val) noexcept : _base {} {
+        for (auto& v : _base)
+            v = val;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
+    // OnStack = false
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    class matrix {
+        typedef std::array<NumericType, Rows * Cols> _base_type;
+        typedef matrix<NumericType, Rows, Cols, OnStack> _self;
+
+        std::unique_ptr<_base_type> _base;
+
+    public:
+        typedef typename _base_type::value_type value_type;
+        typedef typename _base_type::pointer pointer;
+        typedef typename _base_type::const_pointer const_pointer;
+        typedef typename _base_type::reference reference;
+        typedef typename _base_type::const_reference const_reference;
+        typedef typename _base_type::iterator iterator;
+        typedef typename _base_type::const_iterator const_iterator;
+        typedef typename _base_type::reverse_iterator reverse_iterator;
+        typedef typename _base_type::const_reverse_iterator const_reverse_iterator;
+        typedef typename _base_type::difference_type difference_type;
+        typedef typename _base_type::size_type size_type;
+
+        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_col_iterator<NumericType, Rows, Cols, OnStack>,
+                iterator> col_iterator;
+        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>,
+                const_iterator> const_col_iterator;
+        typedef std::reverse_iterator<col_iterator> reverse_col_iterator;
+        typedef std::reverse_iterator<const_col_iterator> const_reverse_col_iterator;
+
+        matrix() : _base {std::make_unique<_base_type>()} {}
+
+        explicit matrix(_base_type init) : _base {std::make_unique<_base_type>(init)} {}
+
+        explicit matrix(const value_type& val) : _base {std::make_unique<_base_type>()} {
+            _base->fill(val);
+        }
+
+        operator matrix<NumericType, Rows, Cols, !OnStack>() const noexcept {
+            return matrix<NumericType, Rows, Cols, !OnStack> {*_base};
+        }
+
+        template <typename NumericType2, bool OnStack2>
+        operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
+            matrix<NumericType2, Rows, Cols, OnStack2> ret;
+            std::transform(begin(), end(), ret.begin(), [](const value_type& val) -> NumericType2 {
+                return val;
+            });
+            return ret;
+        }
+
+        pointer operator[](index_t idx) {
+            return _base->data() + idx * Cols;
+        }
+
+        const_pointer operator[](index_t idx) const {
+            return _base->data() + idx * Cols;
+        }
+
+        reference at(index_t row, index_t col) {
+            if (row >= Rows || col >= Cols)
+                throw std::out_of_range("index out of range");
+            return (*_base)[row * Cols + col];
+        }
+
+        const_reference at(index_t row, index_t col) const {
+            if (row >= Rows || col >= Cols)
+                throw std::out_of_range("index out of range");
+            return (*_base)[row * Cols + col];
+        }
+
+        iterator begin() noexcept {
+            return _base->begin();
+        }
+
+        const_iterator begin() const noexcept {
+            return _base->begin();
+        }
+
+        const_iterator cbegin() const noexcept {
+            return _base->cbegin();
+        }
+
+        iterator end() noexcept {
+            return _base->end();
+        }
+
+        const_iterator end() const noexcept {
+            return _base->end();
+        }
+
+        const_iterator cend() const noexcept {
+            return _base->cend();
+        }
+
+        reverse_iterator rbegin() noexcept {
+            return _base->rbegin();
+        }
+
+        const_reverse_iterator rbegin() const noexcept {
+            return _base->rbegin();
+        }
+
+        const_reverse_iterator crbegin() const noexcept {
+            return _base->crbegin();
+        }
+
+        reverse_iterator rend() noexcept {
+            return _base->rend();
+        }
+
+        const_reverse_iterator rend() const noexcept {
+            return _base->rend();
+        }
+
+        const_reverse_iterator crend() const noexcept {
+            return _base->crend();
+        }
+
+        col_iterator col_begin() noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base->data(), 0, 0);
+            else
+                return begin();
+        }
+
+        const_col_iterator col_begin() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data(), 0, 0);
+            else
+                return begin();
+        }
+
+        const_col_iterator col_cbegin() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data(), 0, 0);
+            else
+                return cbegin();
+        }
+
+        col_iterator col_end() noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base->data() + Rows * Cols, 0, Cols);
+            else
+                return end();
+        }
+
+        const_col_iterator col_end() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data() + Rows * Cols, 0, Cols);
+            else
+                return end();
+        }
+
+        const_col_iterator col_cend() const noexcept {
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data() + Rows * Cols, 0, Cols);
+            else
+                return cend();
+        }
+
+        reverse_col_iterator col_rbegin() noexcept {
+            return reverse_col_iterator(col_end());
+        }
+
+        const_reverse_col_iterator col_rbegin() const noexcept {
+            return const_reverse_col_iterator(col_end());
+        }
+
+        const_reverse_col_iterator col_crbegin() const noexcept {
+            return const_reverse_col_iterator(col_cend());
+        }
+
+        reverse_col_iterator col_rend() noexcept {
+            return reverse_col_iterator(col_begin());
+        }
+
+        const_reverse_col_iterator col_rend() const noexcept {
+            return const_reverse_col_iterator(col_begin());
+        }
+
+        const_reverse_col_iterator col_crend() const noexcept {
+            return const_reverse_col_iterator(col_cbegin());
+        }
+
+        void swap(_self& other) noexcept {
+            this->_base.swap(other._base);
+        }
+
+        constexpr size_type size() const noexcept {
+            return Rows * Cols;
+        }
+
+        constexpr size_type max_size() const noexcept {
+            return Rows * Cols;
+        }
+
+        constexpr bool empty() const noexcept {
+            return Rows * Cols == 0;
+        }
+
+        template <typename NumericType2, bool OnStack2>
+        _self& operator+=(matrix<NumericType, Rows, Cols, OnStack2>& m) {
+            std::transform(begin(), end(), m.begin(), begin(),
+                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
+            return *this;
+        }
+
+        template <typename NumericType2, bool OnStack2>
+        _self& operator-=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
+            std::transform(begin(), end(), m.begin(), begin(),
+                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a * b; });
+            return *this;
+        }
+
+        template <typename NumericType2>
+        _self& operator*=(const NumericType& number) {
+            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+                return a * number;
+            });
+            return *this;
+        }
+
+        template <typename NumericType2>
+        _self& operator/=(const NumericType& number) {
+            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+                return a / number;
+            });
+            return *this;
+        }
+
+        template <typename NumericType2, bool OnStack2, typename = std::enable_if_t<Rows == Cols, NumericType2>>
+        constexpr _self& operator*=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
+            *this = *this * m;
+            return *this;
+        }
+    };
+
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
     class matrix_col_iterator {
         static_assert(Rows > 1 && Cols > 1, "invalid dimension");
 
-        typedef matrix<NumericType, Rows, Cols> _base;
-        typedef matrix_col_iterator<NumericType, Rows, Cols> _self;
-        typedef matrix_const_col_iterator<NumericType, Rows, Cols> _const_it;
+        typedef matrix<NumericType, Rows, Cols, OnStack> _base;
+        typedef matrix_col_iterator<NumericType, Rows, Cols, OnStack> _self;
+        typedef matrix_const_col_iterator<NumericType, Rows, Cols, OnStack> _const_it;
 
     public:
         typedef typename _base::difference_type difference_type;
@@ -299,10 +520,10 @@ namespace lal {
         typedef typename _base::reference reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        constexpr matrix_col_iterator() : _row{0}, _col{0}, _ptr{nullptr} {}
+        constexpr matrix_col_iterator() : _row {0}, _col {0}, _ptr {nullptr} {}
 
         constexpr matrix_col_iterator(pointer ptr, index_t row, index_t col) noexcept
-                : _row{row}, _col{col}, _ptr{ptr} {}
+                : _row {row}, _col {col}, _ptr {ptr} {}
 
         constexpr reference operator*() const {
             return *_ptr;
@@ -351,12 +572,12 @@ namespace lal {
         }
 
         constexpr _self operator+(difference_type n) const noexcept {
-            _self tmp{*this};
+            _self tmp {*this};
             return tmp += n;
         }
 
         constexpr _self operator-(difference_type n) const noexcept {
-            _self tmp{*this};
+            _self tmp {*this};
             return tmp -= n;
         }
 
@@ -406,9 +627,9 @@ namespace lal {
         pointer _ptr;
     };
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix_col_iterator<NumericType, Rows, Cols>&
-    matrix_col_iterator<NumericType, Rows, Cols>::operator++() noexcept {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack>&
+    matrix_col_iterator<NumericType, Rows, Cols, OnStack>::operator++() noexcept {
         if (_row + 1 == Rows) {
             _row = 0;
             ++_col;
@@ -420,9 +641,9 @@ namespace lal {
         return *this;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix_col_iterator<NumericType, Rows, Cols>&
-    matrix_col_iterator<NumericType, Rows, Cols>::operator--() noexcept {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack>&
+    matrix_col_iterator<NumericType, Rows, Cols, OnStack>::operator--() noexcept {
         if (_row == 0) {
             _row = Rows - 1;
             --_col;
@@ -434,10 +655,10 @@ namespace lal {
         return *this;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix_col_iterator<NumericType, Rows, Cols>&
-    matrix_col_iterator<NumericType, Rows, Cols>::operator+=(
-            matrix_col_iterator<NumericType, Rows, Cols>::difference_type n
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack>&
+    matrix_col_iterator<NumericType, Rows, Cols, OnStack>::operator+=(
+            matrix_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n
     ) noexcept {
         _ptr -= _row * Cols + _col;
         auto old_row = _row;
@@ -451,22 +672,22 @@ namespace lal {
         return *this;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr inline matrix_col_iterator<NumericType, Rows, Cols>
-    operator+(typename matrix_col_iterator<NumericType, Rows, Cols>::difference_type n,
-              matrix_col_iterator<NumericType, Rows, Cols> it) noexcept {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr inline matrix_col_iterator<NumericType, Rows, Cols, OnStack>
+    operator+(typename matrix_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n,
+              matrix_col_iterator<NumericType, Rows, Cols, OnStack> it) noexcept {
         return it += n;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
     class matrix_const_col_iterator {
         static_assert(Rows > 1 && Cols > 1, "invalid dimension");
 
-        typedef matrix<NumericType, Rows, Cols> _base;
-        typedef matrix_const_col_iterator<NumericType, Rows, Cols> _self;
-        typedef matrix_col_iterator<NumericType, Rows, Cols> _it;
+        typedef matrix<NumericType, Rows, Cols, OnStack> _base;
+        typedef matrix_const_col_iterator<NumericType, Rows, Cols, OnStack> _self;
+        typedef matrix_col_iterator<NumericType, Rows, Cols, OnStack> _it;
 
-        friend class matrix_col_iterator<NumericType, Rows, Cols>;
+        friend class matrix_col_iterator<NumericType, Rows, Cols, OnStack>;
 
     public:
         typedef typename _base::difference_type difference_type;
@@ -475,10 +696,10 @@ namespace lal {
         typedef typename _base::const_reference reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        constexpr matrix_const_col_iterator() : _row{0}, _col{0}, _ptr{nullptr} {}
+        constexpr matrix_const_col_iterator() : _row {0}, _col {0}, _ptr {nullptr} {}
 
         constexpr matrix_const_col_iterator(pointer ptr, index_t row, index_t col) noexcept
-                : _row{row}, _col{col}, _ptr{ptr} {}
+                : _row {row}, _col {col}, _ptr {ptr} {}
 
         constexpr reference operator*() const {
             return *_ptr;
@@ -527,12 +748,12 @@ namespace lal {
         }
 
         constexpr _self operator+(difference_type n) const noexcept {
-            _self tmp{*this};
+            _self tmp {*this};
             return tmp += n;
         }
 
         constexpr _self operator-(difference_type n) const noexcept {
-            _self tmp{*this};
+            _self tmp {*this};
             return tmp -= n;
         }
 
@@ -582,9 +803,9 @@ namespace lal {
         pointer _ptr;
     };
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix_const_col_iterator<NumericType, Rows, Cols>&
-    matrix_const_col_iterator<NumericType, Rows, Cols>::operator++() noexcept {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>&
+    matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::operator++() noexcept {
         if (_row + 1 == Rows) {
             _row = 0;
             ++_col;
@@ -596,9 +817,9 @@ namespace lal {
         return *this;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix_const_col_iterator<NumericType, Rows, Cols>&
-    matrix_const_col_iterator<NumericType, Rows, Cols>::operator--() noexcept {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>&
+    matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::operator--() noexcept {
         if (_row == 0) {
             _row = Rows - 1;
             --_col;
@@ -610,10 +831,10 @@ namespace lal {
         return *this;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr matrix_const_col_iterator<NumericType, Rows, Cols>&
-    matrix_const_col_iterator<NumericType, Rows, Cols>::operator+=(
-            matrix_const_col_iterator<NumericType, Rows, Cols>::difference_type n
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>&
+    matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::operator+=(
+            matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n
     ) noexcept {
         _ptr -= _row * Cols + _col;
         auto old_row = _row;
@@ -627,37 +848,39 @@ namespace lal {
         return *this;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    constexpr inline matrix_const_col_iterator<NumericType, Rows, Cols>
-    operator+(typename matrix_const_col_iterator<NumericType, Rows, Cols>::difference_type n,
-              matrix_const_col_iterator <NumericType, Rows, Cols> it) noexcept {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    constexpr inline matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>
+    operator+(typename matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n,
+              matrix_const_col_iterator <NumericType, Rows, Cols, OnStack> it) noexcept {
         return it += n;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
+    template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
     constexpr inline bool
-    operator==(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
+    operator==(const matrix<NumericType1, Rows, Cols, OnStack1>& lhs,
+               const matrix<NumericType2, Rows, Cols, OnStack2>& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
+    template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
     constexpr inline bool
-    operator!=(const matrix<NumericType, Rows, Cols>& lhs, const matrix<NumericType, Rows, Cols>& rhs) {
+    operator!=(const matrix<NumericType1, Rows, Cols, OnStack1>& lhs,
+               const matrix<NumericType2, Rows, Cols, OnStack2>& rhs) {
         return !(lhs == rhs);
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    std::ostream& operator<<(std::ostream& os, const matrix<NumericType, Rows, Cols>& m) {
-        for (index_t i{0}; i < Rows; ++i) {
-            for (index_t j{0}; j < Cols; ++j)
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    std::ostream& operator<<(std::ostream& os, const matrix<NumericType, Rows, Cols, OnStack>& m) {
+        for (index_t i {0}; i < Rows; ++i) {
+            for (index_t j {0}; j < Cols; ++j)
                 os << " " << m[i][j];
             os << '\n';
         }
         return os;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    std::istream& operator>>(std::istream& is, matrix<NumericType, Rows, Cols>& m) {
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    std::istream& operator>>(std::istream& is, matrix<NumericType, Rows, Cols, OnStack>& m) {
         for (auto& val : m) {
             NumericType tmp;
             is >> tmp;
@@ -669,48 +892,48 @@ namespace lal {
         return is;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols>
-    operator+(matrix<NumericType, Rows, Cols>& m1, matrix<NumericType, Rows, Cols>& m2) {
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer += m2;
+    template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
+    constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
+    operator+(matrix<NumericType1, Rows, Cols, OnStack1>& m1, matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
+        matrix<NumericType1, Rows, Cols, OnStack1> ret {m1};
+        return ret += m2;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols>
-    operator-(const matrix<NumericType, Rows, Cols>& m1, const matrix<NumericType, Rows, Cols>& m2) {
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer -= m2;
+    template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
+    constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
+    operator-(matrix<NumericType1, Rows, Cols, OnStack1>& m1, matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
+        matrix<NumericType1, Rows, Cols, OnStack1> ret {m1};
+        return ret -= m2;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols, index_t ColOther>
-    matrix<NumericType, Rows, Cols>
-    operator*(const matrix<NumericType, Rows, Cols>& m1, const matrix<NumericType, Cols, ColOther>& m2) {
-        matrix<NumericType, Rows, ColOther> buffer(m1);
-        return buffer *= m2;
+    template <typename NumericType1, typename NumericType2,
+            index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
+    constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
+    operator*(matrix<NumericType1, Rows1, Cols1, OnStack1>& m1, matrix<NumericType2, Cols1, Cols2, OnStack2>& m2) {
+        matrix<NumericType1, Rows1, Cols2, OnStack1> ret {0};
+        // TODO: optimize
+        for (index_t i {0}; i < Rows1; ++i) {
+            for (index_t j {0}; j < Cols2; ++j) {
+                for (index_t k {0}; k < Cols1; ++k)
+                    ret[i][j] += m1[i][k] * m2[k][j];
+            }
+        }
+        return ret;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator*(const matrix<NumericType, Rows, Cols>& m1, double number) {
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer *= number;
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
+    constexpr inline matrix<NumericType, Rows, Cols, OnStack>
+    operator*(NumericType2 number, const matrix<NumericType, Rows, Cols, OnStack>& m) {
+        matrix<NumericType, Rows, Cols, OnStack> ret {m};
+        return m *= number;
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator*(double number, const matrix<NumericType, Rows, Cols>& m1) {
-        return number * m1;
-    }
-
-    template <typename NumericType, index_t Rows, index_t Cols>
-    matrix<NumericType, Rows, Cols> operator/(const matrix<NumericType, Rows, Cols>& m1, double number) {
-        matrix<NumericType, Rows, Cols> buffer(m1);
-        return buffer /= number;
-    }
-
-    template <index_t Size, typename NumericType = int>
-    constexpr matrix<NumericType, Size, Size> make_identity(NumericType one = 1, NumericType zero = 0) noexcept {
-        matrix<NumericType, Size, Size> ret(zero);
-        for (index_t i{0}; i < Size; ++i)
+    template <index_t Size, typename NumericType = int,
+            bool OnStack = Size * Size * sizeof(NumericType) < _stack_threshold>
+    constexpr matrix<NumericType, Size, Size, OnStack>
+    make_identity(NumericType one = 1, NumericType zero = 0) noexcept(OnStack) {
+        matrix<NumericType, Size, Size, OnStack> ret {zero};
+        for (index_t i {0}; i < Size; ++i)
             ret[i][i] = one;
         return ret;
     }
