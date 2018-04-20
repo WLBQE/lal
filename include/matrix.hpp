@@ -25,6 +25,9 @@ namespace lal {
             bool OnStack = Rows * Cols * sizeof(NumericType) < _stack_threshold>
     class matrix;
 
+    template <typename NumericType, index_t Size, bool OnStack = Size * Size * sizeof(NumericType) < _stack_threshold>
+    using square_matrix = matrix<NumericType, Size, Size, OnStack>;
+
     template <typename NumericType1, typename NumericType2,
             index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
     constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
@@ -32,8 +35,8 @@ namespace lal {
 
     template <typename NumericType, index_t Rows, index_t Cols>
     class matrix<NumericType, Rows, Cols, true> {
-        typedef std::array<NumericType, Rows * Cols> _base_type;
-        typedef matrix<NumericType, Rows, Cols, true> _self;
+        using _base_type = std::array<NumericType, Rows * Cols>;
+        using _self = matrix<NumericType, Rows, Cols, true>;
 
         _base_type _base;
 
@@ -167,21 +170,21 @@ namespace lal {
 
         constexpr col_iterator col_end() noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base.data() + Rows * Cols, Rows - 1, Cols - 1);
+                return col_iterator(_base.data() + Rows * Cols, 0, Cols);
             else
                 return end();
         }
 
         constexpr const_col_iterator col_end() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data() + Rows * Cols, Rows - 1, Cols - 1);
+                return const_col_iterator(_base.data() + Rows * Cols, 0, Cols);
             else
                 return end();
         }
 
         constexpr const_col_iterator col_cend() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data() + Rows * Cols, Rows - 1, Cols - 1);
+                return const_col_iterator(_base.data() + Rows * Cols, 0, Cols);
             else
                 return cend();
         }
@@ -208,6 +211,144 @@ namespace lal {
 
         constexpr const_reverse_col_iterator col_crend() const noexcept {
             return const_reverse_col_iterator(col_cbegin());
+        }
+
+        constexpr iterator begin(index_t row) {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base.begin() + row * Cols;
+        }
+
+        constexpr const_iterator begin(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base.begin() + row * Cols;
+        }
+
+        constexpr const_iterator cbegin(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base.cbegin() + row * Cols;
+        }
+
+        constexpr iterator end(index_t row) {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base.begin() + (row + 1) * Cols;
+        }
+
+        constexpr const_iterator end(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base.begin() + (row + 1) * Cols;
+        }
+
+        constexpr const_iterator cend(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base.cend() + (row + 1) * Cols;
+        }
+
+        constexpr reverse_iterator rbegin(index_t row) {
+            return reverse_col_iterator(end(row));
+        }
+
+        constexpr const_reverse_iterator rbegin(index_t row) const {
+            return reverse_col_iterator(end(row));
+        }
+
+        constexpr const_reverse_iterator crbegin(index_t row) const {
+            return reverse_col_iterator(cend(row));
+        }
+
+        constexpr reverse_iterator rend(index_t row) {
+            return reverse_col_iterator(begin(row));
+        }
+
+        constexpr const_reverse_iterator rend(index_t row) const {
+            return reverse_col_iterator(begin(row));
+        }
+
+        constexpr const_reverse_iterator crend(index_t row) const {
+            return reverse_col_iterator(cbegin(row));
+        }
+
+        constexpr col_iterator col_begin(index_t col) {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base.data(), 0, col);
+            else
+                return begin() + col;
+        }
+
+        constexpr const_col_iterator col_begin(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data(), 0, col);
+            else
+                return begin() + col;
+        }
+
+        constexpr const_col_iterator col_cbegin(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data(), 0, col);
+            else
+                return cbegin() + col;
+        }
+
+        constexpr col_iterator col_end(index_t col) {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base.data() + Rows * Cols, 0, col + 1);
+            else
+                return begin() + col + 1;
+        }
+
+        constexpr const_col_iterator col_end(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data() + Rows * Cols, 0, col + 1);
+            else
+                return begin() + col + 1;
+        }
+
+        constexpr const_col_iterator col_cend(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base.data() + Rows * Cols, 0, col + 1);
+            else
+                return begin() + col + 1;
+        }
+
+        constexpr reverse_col_iterator col_rbegin(index_t col) {
+            return reverse_col_iterator(col_end(col));
+        }
+
+        constexpr const_reverse_col_iterator col_rbegin(index_t col) const {
+            return const_reverse_col_iterator(col_end(col));
+        }
+
+        constexpr const_reverse_col_iterator col_crbegin(index_t col) const {
+            return const_reverse_col_iterator(col_cend(col));
+        }
+
+        constexpr reverse_col_iterator col_rend(index_t col) {
+            return reverse_col_iterator(col_begin(col));
+        }
+
+        constexpr const_reverse_col_iterator col_rend(index_t col) const {
+            return const_reverse_col_iterator(col_begin(col));
+        }
+
+        constexpr const_reverse_col_iterator col_crend(index_t col) const {
+            return const_reverse_col_iterator(col_cbegin(col));
         }
 
         void swap(_self& other) noexcept {
@@ -272,8 +413,8 @@ namespace lal {
     // OnStack = false
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
     class matrix {
-        typedef std::array<NumericType, Rows * Cols> _base_type;
-        typedef matrix<NumericType, Rows, Cols, OnStack> _self;
+        using _base_type = std::array<NumericType, Rows * Cols>;
+        using _self = matrix<NumericType, Rows, Cols, OnStack>;
 
         std::unique_ptr<_base_type> _base;
 
@@ -452,6 +593,144 @@ namespace lal {
             return const_reverse_col_iterator(col_cbegin());
         }
 
+        constexpr iterator begin(index_t row) {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base->begin() + row * Cols;
+        }
+
+        constexpr const_iterator begin(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base->begin() + row * Cols;
+        }
+
+        constexpr const_iterator cbegin(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base->cbegin() + row * Cols;
+        }
+
+        constexpr iterator end(index_t row) {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base->begin() + (row + 1) * Cols;
+        }
+
+        constexpr const_iterator end(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base->begin() + (row + 1) * Cols;
+        }
+
+        constexpr const_iterator cend(index_t row) const {
+            if (row >= Rows)
+                throw std::out_of_range("row number out of range");
+            return _base->cend() + (row + 1) * Cols;
+        }
+
+        constexpr reverse_iterator rbegin(index_t row) {
+            return reverse_col_iterator(end(row));
+        }
+
+        constexpr const_reverse_iterator rbegin(index_t row) const {
+            return reverse_col_iterator(end(row));
+        }
+
+        constexpr const_reverse_iterator crbegin(index_t row) const {
+            return reverse_col_iterator(cend(row));
+        }
+
+        constexpr reverse_iterator rend(index_t row) {
+            return reverse_col_iterator(begin(row));
+        }
+
+        constexpr const_reverse_iterator rend(index_t row) const {
+            return reverse_col_iterator(begin(row));
+        }
+
+        constexpr const_reverse_iterator crend(index_t row) const {
+            return reverse_col_iterator(cbegin(row));
+        }
+
+        constexpr col_iterator col_begin(index_t col) {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base->data(), 0, col);
+            else
+                return begin() + col;
+        }
+
+        constexpr const_col_iterator col_begin(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data(), 0, col);
+            else
+                return begin() + col;
+        }
+
+        constexpr const_col_iterator col_cbegin(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data(), 0, col);
+            else
+                return cbegin() + col;
+        }
+
+        constexpr col_iterator col_end(index_t col) {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return col_iterator(_base->data() + Rows * Cols, 0, col + 1);
+            else
+                return begin() + col + 1;
+        }
+
+        constexpr const_col_iterator col_end(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data() + Rows * Cols, 0, col + 1);
+            else
+                return begin() + col + 1;
+        }
+
+        constexpr const_col_iterator col_cend(index_t col) const {
+            if (col >= Cols)
+                throw std::out_of_range("column number out of range");
+            if constexpr (Rows > 1 && Cols > 1)
+                return const_col_iterator(_base->data() + Rows * Cols, 0, col + 1);
+            else
+                return begin() + col + 1;
+        }
+
+        constexpr reverse_col_iterator col_rbegin(index_t col) {
+            return reverse_col_iterator(col_end(col));
+        }
+
+        constexpr const_reverse_col_iterator col_rbegin(index_t col) const {
+            return const_reverse_col_iterator(col_end(col));
+        }
+
+        constexpr const_reverse_col_iterator col_crbegin(index_t col) const {
+            return const_reverse_col_iterator(col_cend(col));
+        }
+
+        constexpr reverse_col_iterator col_rend(index_t col) {
+            return reverse_col_iterator(col_begin(col));
+        }
+
+        constexpr const_reverse_col_iterator col_rend(index_t col) const {
+            return const_reverse_col_iterator(col_begin(col));
+        }
+
+        constexpr const_reverse_col_iterator col_crend(index_t col) const {
+            return const_reverse_col_iterator(col_cbegin(col));
+        }
+
         void swap(_self& other) noexcept {
             this->_base.swap(other._base);
         }
@@ -509,9 +788,9 @@ namespace lal {
     class matrix_col_iterator {
         static_assert(Rows > 1 && Cols > 1, "invalid dimension");
 
-        typedef matrix<NumericType, Rows, Cols, OnStack> _base;
-        typedef matrix_col_iterator<NumericType, Rows, Cols, OnStack> _self;
-        typedef matrix_const_col_iterator<NumericType, Rows, Cols, OnStack> _const_it;
+        using _base = matrix<NumericType, Rows, Cols, OnStack>;
+        using _self = matrix_col_iterator<NumericType, Rows, Cols, OnStack>;
+        using _const_it = matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>;
 
     public:
         typedef typename _base::difference_type difference_type;
@@ -683,9 +962,9 @@ namespace lal {
     class matrix_const_col_iterator {
         static_assert(Rows > 1 && Cols > 1, "invalid dimension");
 
-        typedef matrix<NumericType, Rows, Cols, OnStack> _base;
-        typedef matrix_const_col_iterator<NumericType, Rows, Cols, OnStack> _self;
-        typedef matrix_col_iterator<NumericType, Rows, Cols, OnStack> _it;
+        using _base = matrix<NumericType, Rows, Cols, OnStack>;
+        using _self = matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>;
+        using _it = matrix_col_iterator<NumericType, Rows, Cols, OnStack>;
 
         friend class matrix_col_iterator<NumericType, Rows, Cols, OnStack>;
 
