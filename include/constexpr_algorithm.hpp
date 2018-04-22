@@ -1,5 +1,5 @@
-#ifndef LAL_CONSTEXPR_ALGORITHM
-#define LAL_CONSTEXPR_ALGORITHM
+#ifndef LAL_CONSTEXPR_ALGORITHM_HPP
+#define LAL_CONSTEXPR_ALGORITHM_HPP
 
 namespace lal::algo {
     template <typename InputIt, typename OutputIt>
@@ -34,4 +34,4 @@ namespace lal::algo {
     }
 }
 
-#endif // LAL_CONSTEXPR_ALGORITHM
+#endif // LAL_CONSTEXPR_ALGORITHM_HPP

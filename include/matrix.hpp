@@ -11,7 +11,7 @@
 #include "constexpr_algorithm.hpp"
 
 namespace lal {
-    constexpr static std::size_t _stack_threshold {0x100};
+    constexpr std::size_t _stack_threshold {0x100};
 
     typedef std::size_t index_t;
 
@@ -56,8 +56,8 @@ namespace lal {
         typedef typename _base_type::difference_type difference_type;
         typedef typename _base_type::size_type size_type;
 
-        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_col_iterator<NumericType, Rows, Cols, true>,
-                iterator> col_iterator;
+        typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_col_iterator<NumericType, Rows, Cols, true>, iterator>
+                col_iterator;
         typedef std::conditional_t<(Rows > 1 && Cols > 1), matrix_const_col_iterator<NumericType, Rows, Cols, true>,
                 const_iterator> const_col_iterator;
         typedef std::reverse_iterator<col_iterator> reverse_col_iterator;
@@ -355,7 +355,7 @@ namespace lal {
         }
 
         void swap(_self& other) noexcept {
-            this->_base.swap(other._base);
+            _base.swap(other._base);
         }
 
         constexpr size_type size() const noexcept {
@@ -386,7 +386,7 @@ namespace lal {
 
         template <typename NumericType2>
         constexpr _self& operator*=(const NumericType2& number) {
-            algo::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+            algo::transform(begin(), end(), begin(), [number](const NumericType& a) -> NumericType {
                 return a * number;
             });
             return *this;
@@ -394,7 +394,7 @@ namespace lal {
 
         template <typename NumericType2>
         constexpr _self& operator/=(const NumericType2& number) {
-            algo::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+            algo::transform(begin(), end(), begin(), [number](const NumericType& a) -> NumericType {
                 return a / number;
             });
             return *this;
@@ -741,7 +741,7 @@ namespace lal {
         }
 
         void swap(_self& other) noexcept {
-            this->_base.swap(other._base);
+            _base.swap(other._base);
         }
 
         constexpr size_type size() const noexcept {
@@ -772,7 +772,7 @@ namespace lal {
 
         template <typename NumericType2>
         _self& operator*=(const NumericType& number) {
-            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+            std::transform(begin(), end(), begin(), [number](const NumericType& a) -> NumericType {
                 return a * number;
             });
             return *this;
@@ -780,7 +780,7 @@ namespace lal {
 
         template <typename NumericType2>
         _self& operator/=(const NumericType& number) {
-            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+            std::transform(begin(), end(), begin(), [number](const NumericType& a) -> NumericType {
                 return a / number;
             });
             return *this;
@@ -896,6 +896,10 @@ namespace lal {
         }
 
         constexpr difference_type operator-(const _self& other) const noexcept {
+            return (_col - other._col) * Rows + _row - other._row;
+        }
+
+        constexpr difference_type operator-(const _const_it& other) const noexcept {
             return (_col - other._col) * Rows + _row - other._row;
         }
 
@@ -1067,6 +1071,10 @@ namespace lal {
             return (_col - other._col) * Rows + _row - other._row;
         }
 
+        constexpr difference_type operator-(const _it& other) const noexcept {
+            return (_col - other._col) * Rows + _row - other._row;
+        }
+
         constexpr reference operator[](difference_type n) const {
             return *(*this + n);
         }
@@ -1147,29 +1155,6 @@ namespace lal {
         return !(lhs == rhs);
     }
 
-    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
-    std::ostream& operator<<(std::ostream& os, const matrix<NumericType, Rows, Cols, OnStack>& m) {
-        for (index_t i {0}; i < Rows; ++i) {
-            for (index_t j {0}; j < Cols; ++j)
-                os << " " << m[i][j];
-            os << '\n';
-        }
-        return os;
-    }
-
-    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
-    std::istream& operator>>(std::istream& is, matrix<NumericType, Rows, Cols, OnStack>& m) {
-        for (auto& val : m) {
-            NumericType tmp;
-            is >> tmp;
-            if (is.good())
-                val = tmp;
-            else
-                break;
-        }
-        return is;
-    }
-
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
     constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
     operator+(const matrix<NumericType1, Rows, Cols, OnStack1>& m1,
@@ -1210,7 +1195,7 @@ namespace lal {
     constexpr inline matrix<NumericType, Rows, Cols, OnStack>
     operator*(const matrix<NumericType, Rows, Cols, OnStack>& m, const NumericType2& number) {
         matrix<NumericType, Rows, Cols, OnStack> ret;
-        algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType2& a) -> NumericType {
+        algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType& a) -> NumericType {
             return a * number;
         });
         return ret;
@@ -1226,8 +1211,8 @@ namespace lal {
     constexpr inline matrix<NumericType, Rows, Cols, OnStack>
     operator/(const matrix<NumericType, Rows, Cols, OnStack>& m, const NumericType2& number) {
         matrix<NumericType, Rows, Cols, OnStack> ret;
-        algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType2& a) -> NumericType {
-            return a * number;
+        algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType& a) -> NumericType {
+            return a / number;
         });
         return ret;
     }
@@ -1240,6 +1225,29 @@ namespace lal {
         for (index_t i {0}; i < Size; ++i)
             ret[i][i] = one;
         return ret;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    std::ostream& operator<<(std::ostream& os, const matrix<NumericType, Rows, Cols, OnStack>& m) {
+        for (index_t i {0}; i < Rows; ++i) {
+            for (index_t j {0}; j < Cols; ++j)
+                os << " " << m[i][j];
+            os << '\n';
+        }
+        return os;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
+    std::istream& operator>>(std::istream& is, matrix<NumericType, Rows, Cols, OnStack>& m) {
+        for (auto& val : m) {
+            NumericType tmp;
+            is >> tmp;
+            if (is.good())
+                val = tmp;
+            else
+                break;
+        }
+        return is;
     }
 }
 

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <array>
+#include <cassert>
 #include "include/matrix.hpp"
+#include "include/vector.hpp"
 
 lal::matrix<int, 3, 3> foo() {
     return lal::matrix<int, 3, 3> {2};
@@ -72,5 +74,24 @@ int main()
     for (auto val : test)
         std::cout << val << ' ';
     std::cout << '\n';
+
+    constexpr lal::vector<int, 5> vec1 {{1, 1, 1, 1, 1}};
+    constexpr lal::vector<int, 5> vec2 {1};
+    constexpr lal::matrix<int, 5, 5> cross_product {1};
+    constexpr lal::matrix<int, 1, 5> mat_vec {1};
+    constexpr lal::matrix<int, 5, 1> mat_vec_t {1};
+    static_assert(vec1 == vec2);
+    static_assert(vec1 * vec2 == 5);
+    static_assert(vec1 + vec2 == 2 * vec1);
+    static_assert(lal::vector_cross_product<true>(vec1, vec2) == cross_product);
+    static_assert(lal::vector_cross_product(vec1, vec2) == cross_product);
+    assert(lal::vector_cross_product<false>(vec1, vec2) == cross_product);
+    assert(lal::vector_cross_product(vec1, vec2) == cross_product);
+    static_assert(vec1.to_matrix() == mat_vec);
+    static_assert(vec2.transpose() == mat_vec_t);
+    assert(vec1.to_matrix<false>() == mat_vec);
+    assert(vec1.transpose<false>() == mat_vec_t);
+    std::cout << vec1 << '\n';
+
     return 0;
 }
