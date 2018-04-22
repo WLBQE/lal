@@ -8,6 +8,8 @@
 #include <iterator>
 #include <type_traits>
 
+#include "constexpr_algorithm.hpp"
+
 namespace lal {
     constexpr static std::size_t _stack_threshold {0x100};
 
@@ -31,7 +33,8 @@ namespace lal {
     template <typename NumericType1, typename NumericType2,
             index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
     constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
-    operator*(matrix<NumericType1, Rows1, Cols1, OnStack1>& m1, matrix<NumericType2, Cols1, Cols2, OnStack2>& m2);
+    operator*(const matrix<NumericType1, Rows1, Cols1, OnStack1>& m1,
+              const matrix<NumericType2, Cols1, Cols2, OnStack2>& m2);
 
     template <typename NumericType, index_t Rows, index_t Cols>
     class matrix<NumericType, Rows, Cols, true> {
@@ -369,21 +372,21 @@ namespace lal {
 
         template <typename NumericType2, bool OnStack2>
         constexpr _self& operator+=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
-            std::transform(begin(), end(), m.begin(), begin(),
+            algo::transform(begin(), end(), m.begin(), begin(),
                            [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
             return *this;
         }
 
         template <typename NumericType2, bool OnStack2>
         constexpr _self& operator-=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
-            std::transform(begin(), end(), m.begin(), begin(),
-                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a * b; });
+            algo::transform(begin(), end(), m.begin(), begin(),
+                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a - b; });
             return *this;
         }
 
         template <typename NumericType2>
         constexpr _self& operator*=(const NumericType2& number) {
-            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+            algo::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
                 return a * number;
             });
             return *this;
@@ -391,7 +394,7 @@ namespace lal {
 
         template <typename NumericType2>
         constexpr _self& operator/=(const NumericType2& number) {
-            std::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
+            algo::transform(begin(), end(), begin(), [number](const NumericType2& a) -> NumericType {
                 return a / number;
             });
             return *this;
@@ -401,6 +404,12 @@ namespace lal {
         constexpr _self& operator*=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
             *this = *this * m;
             return *this;
+        }
+
+        constexpr matrix<NumericType, Cols, Rows, true> transpose() const {
+            matrix<NumericType, Cols, Rows, true> ret;
+            algo::copy(begin(), end(), ret.col_begin());
+            return ret;
         }
     };
 
@@ -757,7 +766,7 @@ namespace lal {
         template <typename NumericType2, bool OnStack2>
         _self& operator-=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
             std::transform(begin(), end(), m.begin(), begin(),
-                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a * b; });
+                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a - b; });
             return *this;
         }
 
@@ -781,6 +790,12 @@ namespace lal {
         _self& operator*=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
             *this = *this * m;
             return *this;
+        }
+
+        matrix<NumericType, Cols, Rows, OnStack> transpose() const {
+            matrix<NumericType, Cols, Rows, OnStack> ret;
+            std::copy(begin(), end(), ret.col_begin());
+            return ret;
         }
     };
 
@@ -815,7 +830,7 @@ namespace lal {
         constexpr _self& operator++() noexcept;
 
         constexpr const _self operator++(int) noexcept {
-            _self tmp = *this;
+            _self tmp {*this};
             ++*this;
             return tmp;
         }
@@ -823,7 +838,7 @@ namespace lal {
         constexpr _self& operator--() noexcept;
 
         constexpr const _self operator--(int) noexcept {
-            _self tmp = *this;
+            _self tmp {*this};
             --*this;
             return tmp;
         }
@@ -955,7 +970,7 @@ namespace lal {
     constexpr inline matrix_col_iterator<NumericType, Rows, Cols, OnStack>
     operator+(typename matrix_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n,
               matrix_col_iterator<NumericType, Rows, Cols, OnStack> it) noexcept {
-        return it += n;
+        return it + n;
     }
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
@@ -991,7 +1006,7 @@ namespace lal {
         constexpr _self& operator++() noexcept;
 
         constexpr const _self operator++(int) noexcept {
-            _self tmp = *this;
+            _self tmp {*this};
             ++*this;
             return tmp;
         }
@@ -999,7 +1014,7 @@ namespace lal {
         constexpr _self& operator--() noexcept;
 
         constexpr const _self operator--(int) noexcept {
-            _self tmp = *this;
+            _self tmp {*this};
             --*this;
             return tmp;
         }
@@ -1131,14 +1146,14 @@ namespace lal {
     constexpr inline matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>
     operator+(typename matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n,
               matrix_const_col_iterator <NumericType, Rows, Cols, OnStack> it) noexcept {
-        return it += n;
+        return it + n;
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
     constexpr inline bool
     operator==(const matrix<NumericType1, Rows, Cols, OnStack1>& lhs,
                const matrix<NumericType2, Rows, Cols, OnStack2>& rhs) {
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+        return algo::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
@@ -1173,22 +1188,29 @@ namespace lal {
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
     constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
-    operator+(matrix<NumericType1, Rows, Cols, OnStack1>& m1, matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
-        matrix<NumericType1, Rows, Cols, OnStack1> ret {m1};
-        return ret += m2;
+    operator+(const matrix<NumericType1, Rows, Cols, OnStack1>& m1,
+              const matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
+        matrix<NumericType1, Rows, Cols, OnStack1> ret;
+        algo::transform(m1.begin(), m1.end(), m2.begin(), ret.begin(),
+                        [](const NumericType1& a, const NumericType2& b) -> NumericType1 { return a + b; });
+        return ret;
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
     constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
-    operator-(matrix<NumericType1, Rows, Cols, OnStack1>& m1, matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
-        matrix<NumericType1, Rows, Cols, OnStack1> ret {m1};
-        return ret -= m2;
+    operator-(const matrix<NumericType1, Rows, Cols, OnStack1>& m1,
+              const matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
+        matrix<NumericType1, Rows, Cols, OnStack1> ret;
+        algo::transform(m1.begin(), m1.end(), m2.begin(), ret.begin(),
+                        [](const NumericType1& a, const NumericType2& b) -> NumericType1 { return a - b; });
+        return ret;
     }
 
     template <typename NumericType1, typename NumericType2,
             index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
     constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
-    operator*(matrix<NumericType1, Rows1, Cols1, OnStack1>& m1, matrix<NumericType2, Cols1, Cols2, OnStack2>& m2) {
+    operator*(const matrix<NumericType1, Rows1, Cols1, OnStack1>& m1,
+              const matrix<NumericType2, Cols1, Cols2, OnStack2>& m2) {
         matrix<NumericType1, Rows1, Cols2, OnStack1> ret {0};
         // TODO: optimize
         for (index_t i {0}; i < Rows1; ++i) {
@@ -1202,15 +1224,34 @@ namespace lal {
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
     constexpr inline matrix<NumericType, Rows, Cols, OnStack>
-    operator*(NumericType2 number, const matrix<NumericType, Rows, Cols, OnStack>& m) {
-        matrix<NumericType, Rows, Cols, OnStack> ret {m};
-        return m *= number;
+    operator*(const matrix<NumericType, Rows, Cols, OnStack>& m, const NumericType2& number) {
+        matrix<NumericType, Rows, Cols, OnStack> ret;
+        algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType2& a) -> NumericType {
+            return a * number;
+        });
+        return ret;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
+    constexpr inline matrix<NumericType, Rows, Cols, OnStack>
+    operator*(const NumericType2& number, const matrix<NumericType, Rows, Cols, OnStack>& m) {
+        return m * number;
+    }
+
+    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
+    constexpr inline matrix<NumericType, Rows, Cols, OnStack>
+    operator/(const matrix<NumericType, Rows, Cols, OnStack>& m, const NumericType2& number) {
+        matrix<NumericType, Rows, Cols, OnStack> ret;
+        algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType2& a) -> NumericType {
+            return a * number;
+        });
+        return ret;
     }
 
     template <index_t Size, typename NumericType = double,
             bool OnStack = Size * Size * sizeof(NumericType) < _stack_threshold>
     constexpr matrix<NumericType, Size, Size, OnStack>
-    make_identity(NumericType one = 1, NumericType zero = 0) noexcept(OnStack) {
+    make_identity(const NumericType& one = 1, const NumericType& zero = 0) noexcept(OnStack) {
         matrix<NumericType, Size, Size, OnStack> ret {zero};
         for (index_t i {0}; i < Size; ++i)
             ret[i][i] = one;
