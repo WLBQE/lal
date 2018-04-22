@@ -59,6 +59,7 @@ int main()
     constexpr lal::matrix<int, 2, 3> test {{1, 2, 3, 4, 5, 6}};
     constexpr lal::matrix<int, 3, 2> test_t {{1, 4, 2, 5, 3, 6}};
     constexpr lal::matrix<int, 2, 3> add_result {{2, 4, 6, 8, 10, 12}};
+    constexpr lal::matrix<int, 2, 2> mult_result {{14, 32, 32, 77}};
     constexpr lal::matrix<int, 2, 3> zeros;
     static_assert(test.transpose() == test_t);
     static_assert(test + test == add_result);
@@ -66,6 +67,10 @@ int main()
     static_assert((lal::make_identity<2, int>() *= 2) == lal::square_matrix<int, 2> {{2, 0, 0, 2}});
     static_assert(test * 2 == add_result);
     static_assert(test / 1 == test);
+    static_assert(test * test_t == mult_result);
     static_assert(2 * test == add_result);
+    for (auto val : test)
+        std::cout << val << ' ';
+    std::cout << '\n';
     return 0;
 }
