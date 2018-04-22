@@ -19,7 +19,7 @@ namespace lal {
     
     
     template <typename NumericType>
-    class dmatrix {
+    class matrix {
         
         using _atom_type = std::vector<NumericType>;
         
