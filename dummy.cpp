@@ -3,7 +3,7 @@
 #include "include/matrix.hpp"
 
 lal::matrix<int, 3, 3> foo() {
-    return lal::matrix<double, 3, 3> {2.5};
+    return lal::matrix<int, 3, 3> {2};
 }
 
 int main()
@@ -18,8 +18,6 @@ int main()
     lal::matrix<int, 3, 3> mat3(222);
     std::cout << mat3;
     mat3[0][0] = 1;
-    std::cout << mat3;
-    //std::cin >> mat3;
     std::cout << mat3;
     lal::matrix<int, 32, 32>::col_iterator ci;
     lal::matrix<int, 32, 32>::const_col_iterator cci;
@@ -48,5 +46,12 @@ int main()
     bbb += bbb;
     std::cout << aaaaa << '\n';
     std::cout << bbb << '\n';
+    for (auto it = bbb.col_begin(); it != bbb.col_end(); ++it)
+        std::cout << *it << ' ';
+    std::cout << '\n';
+    lal::square_matrix<double, 3, true> sq_double {1.3};
+    lal::square_matrix<int, 3, true> sq_int {5};
+    std::cout << sq_int + sq_double << '\n';
+    std::cout << sq_double + sq_int << '\n';
     return 0;
 }
