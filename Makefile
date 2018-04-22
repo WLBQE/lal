@@ -1,7 +1,7 @@
 CXX=clang++
 CXXFLAGS=-std=c++17 -O2 -Wall -Wextra -pedantic
 
-dummy: dummy.cpp include/matrix.hpp
+dummy: dummy.cpp include/matrix.hpp include/constexpr_algorithm.hpp
 	$(CXX) -o dummy $(CXXFLAGS) dummy.cpp
 
 .PHONY: clean
