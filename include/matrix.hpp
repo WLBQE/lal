@@ -827,7 +827,17 @@ namespace lal {
             return _ptr;
         }
 
-        constexpr _self& operator++() noexcept;
+        constexpr _self& operator++() noexcept {
+            if (_row + 1 == Rows) {
+                _row = 0;
+                ++_col;
+                _ptr -= (Rows - 1) * Cols - 1;
+            } else {
+                ++_row;
+                _ptr += Cols;
+            }
+            return *this;
+        }
 
         constexpr const _self operator++(int) noexcept {
             _self tmp {*this};
@@ -835,7 +845,17 @@ namespace lal {
             return tmp;
         }
 
-        constexpr _self& operator--() noexcept;
+        constexpr _self& operator--() noexcept {
+            if (_row == 0) {
+                _row = Rows - 1;
+                --_col;
+                _ptr += (Rows - 1) * Cols - 1;
+            } else {
+                --_row;
+                _ptr -= Cols;
+            }
+            return *this;
+        }
 
         constexpr const _self operator--(int) noexcept {
             _self tmp {*this};
@@ -923,34 +943,6 @@ namespace lal {
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
     constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack>&
-    matrix_col_iterator<NumericType, Rows, Cols, OnStack>::operator++() noexcept {
-        if (_row + 1 == Rows) {
-            _row = 0;
-            ++_col;
-            _ptr -= (Rows - 1) * Cols - 1;
-        } else {
-            ++_row;
-            _ptr += Cols;
-        }
-        return *this;
-    }
-
-    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
-    constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack>&
-    matrix_col_iterator<NumericType, Rows, Cols, OnStack>::operator--() noexcept {
-        if (_row == 0) {
-            _row = Rows - 1;
-            --_col;
-            _ptr += (Rows - 1) * Cols - 1;
-        } else {
-            --_row;
-            _ptr -= Cols;
-        }
-        return *this;
-    }
-
-    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
-    constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack>&
     matrix_col_iterator<NumericType, Rows, Cols, OnStack>::operator+=(
             matrix_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n
     ) noexcept {
@@ -1003,7 +995,17 @@ namespace lal {
             return _ptr;
         }
 
-        constexpr _self& operator++() noexcept;
+        constexpr _self& operator++() noexcept {
+            if (_row + 1 == Rows) {
+                _row = 0;
+                ++_col;
+                _ptr -= (Rows - 1) * Cols - 1;
+            } else {
+                ++_row;
+                _ptr += Cols;
+            }
+            return *this;
+        }
 
         constexpr const _self operator++(int) noexcept {
             _self tmp {*this};
@@ -1011,7 +1013,17 @@ namespace lal {
             return tmp;
         }
 
-        constexpr _self& operator--() noexcept;
+        constexpr _self& operator--() noexcept {
+            if (_row == 0) {
+                _row = Rows - 1;
+                --_col;
+                _ptr += (Rows - 1) * Cols - 1;
+            } else {
+                --_row;
+                _ptr -= Cols;
+            }
+            return *this;
+        }
 
         constexpr const _self operator--(int) noexcept {
             _self tmp {*this};
@@ -1096,34 +1108,6 @@ namespace lal {
         index_t _col;
         pointer _ptr;
     };
-
-    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
-    constexpr matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>&
-    matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::operator++() noexcept {
-        if (_row + 1 == Rows) {
-            _row = 0;
-            ++_col;
-            _ptr -= (Rows - 1) * Cols - 1;
-        } else {
-            ++_row;
-            _ptr += Cols;
-        }
-        return *this;
-    }
-
-    template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
-    constexpr matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>&
-    matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::operator--() noexcept {
-        if (_row == 0) {
-            _row = Rows - 1;
-            --_col;
-            _ptr += (Rows - 1) * Cols - 1;
-        } else {
-            --_row;
-            _ptr -= Cols;
-        }
-        return *this;
-    }
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack>
     constexpr matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>&
