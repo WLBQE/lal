@@ -69,12 +69,12 @@ namespace lal {
 
         constexpr explicit matrix(const value_type& val) noexcept;
 
-        explicit operator matrix<NumericType, Rows, Cols, false>() const {
+        operator matrix<NumericType, Rows, Cols, false>() const {
             return matrix<NumericType, Rows, Cols, false> {_base};
         }
 
         template <typename NumericType2, bool OnStack2>
-        explicit operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
+        operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
             matrix<NumericType2, Rows, Cols, OnStack2> ret;
             std::transform(begin(), end(), ret.begin(), [](const value_type& val) -> NumericType2 {
                 return val;
@@ -455,12 +455,12 @@ namespace lal {
             _base->fill(val);
         }
 
-        explicit operator matrix<NumericType, Rows, Cols, !OnStack>() const noexcept {
+        operator matrix<NumericType, Rows, Cols, !OnStack>() const noexcept {
             return matrix<NumericType, Rows, Cols, !OnStack> {*_base};
         }
 
         template <typename NumericType2, bool OnStack2>
-        explicit operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
+        operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
             matrix<NumericType2, Rows, Cols, OnStack2> ret;
             std::transform(begin(), end(), ret.begin(), [](const value_type& val) -> NumericType2 {
                 return val;

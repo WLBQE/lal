@@ -38,7 +38,7 @@ int main()
     static_assert(ident[0][1] == 0);
     lal::square_matrix<int, 10, false> aa {{1, 2, 3, 4, 5, 6, 7, 8}};
     std::cout << aa << '\n';
-    lal::square_matrix<int, 10, true> bb {aa};
+    lal::square_matrix<int, 10, true> bb = aa;
     std::cout << bb << '\n';
     auto aaaaa = foo();
     aaaaa *= aaaaa;
