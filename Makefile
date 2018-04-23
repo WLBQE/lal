@@ -1,9 +1,11 @@
-CXX=clang++
-CXXFLAGS=-std=c++17 -O2 -Wall -Wextra -pedantic
+CXX = clang++
+CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -pedantic
 
-dummy: dummy.cpp include/matrix.hpp include/constexpr_algorithm.hpp include/vector.hpp
-	$(CXX) -o dummy $(CXXFLAGS) dummy.cpp
+INCLUDE = include/vector.hpp include/matrix.hpp include/dmatrix.hpp include/constexpr_algorithm.hpp
+
+test: test.cpp $(INCLUDE)
+	$(CXX) -o test $(CXXFLAGS) test.cpp
 
 .PHONY: clean
 clean:
-	rm -f dummy
+	rm -f test
