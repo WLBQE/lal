@@ -83,7 +83,6 @@ int main()
     std::cout << *it_col1 << "\n";
     it_col1 -= 1;
     std::cout << *it_col1 << "\n";
-    return 0;
     
     i = 0;
     for (auto it = mat_on_stack.col_cbegin(); it < mat_on_stack.col_cend(); it++){
@@ -115,7 +114,11 @@ int main()
 
 
 
-    return 0;
+
+
+
+
+
     lal::matrix<int, 32, 32>::col_iterator ci;
     lal::matrix<int, 32, 32>::const_col_iterator cci;
     if (ci == cci && cci == ci)

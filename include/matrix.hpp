@@ -951,12 +951,12 @@ namespace lal {
             matrix_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n
     ) noexcept {
         _ptr -= _row * Cols + _col;
-        auto old_row = _row;
-        _row = (_row + n) % Rows;
-        _col += (old_row + n) / Rows;
+        auto new_pos = _col * Rows + _row + n;
+        _row = new_pos % Rows;
+        _col = new_pos / Rows;
         if (_row < 0) {
-            _row += Rows;
             --_col;
+            _row += Rows;
         }
         _ptr += _row * Cols + _col;
         return *this;
@@ -1123,12 +1123,12 @@ namespace lal {
             matrix_const_col_iterator<NumericType, Rows, Cols, OnStack>::difference_type n
     ) noexcept {
         _ptr -= _row * Cols + _col;
-        auto old_row = _row;
-        _row = (_row + n) % Rows;
-        _col += (old_row + n) / Rows;
+        auto new_pos = _col * Rows + _row + n;
+        _row = new_pos % Rows;
+        _col = new_pos / Rows;
         if (_row < 0) {
-            _row += Rows;
             --_col;
+            _row += Rows;
         }
         _ptr += _row * Cols + _col;
         return *this;
