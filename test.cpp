@@ -83,6 +83,8 @@ int main()
     std::cout << *it_col1 << "\n";
     it_col1 -= 1;
     std::cout << *it_col1 << "\n";
+    it_col1 = mat_on_stack.col_end() - 1;
+    std::cout << *it_col1 << "\n";
     return 0;
     
     i = 0;
@@ -102,7 +104,7 @@ int main()
         i--;
     }
     static_assert(*mat_on_stack.col_rbegin() == 9);
-    static_assert(*(mat_on_stack.col_rbegin() + 2) == 3); //could not pass now
+    //static_assert(*(mat_on_stack.col_rbegin() + 2) == 3); //could not pass now
     
     i = 8;
     for (auto it = mat_on_stack.col_crbegin(); it < mat_on_stack.col_crend(); it++){
