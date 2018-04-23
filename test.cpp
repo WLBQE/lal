@@ -108,8 +108,8 @@ int main()
         assert(*it == mat_on_stack[i%3][i/3]);
         i--;
     }
-    static_assert(*mat_on_stack.crbegin() == 9);
-    //static_assert(*(mat_on_stack.crbegin() + 1) == 6);
+    static_assert(*mat_on_stack.col_crbegin() == 9);
+    static_assert(*(mat_on_stack.col_crbegin() + 1) == 6);
 
 
 

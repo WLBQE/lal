@@ -243,7 +243,11 @@ namespace lal {
 
     template <typename NumericType1, index_t Size, typename NumericType2, index_t Cols, bool OnStack>
     constexpr inline vector<NumericType1, Cols>
-    operator*(const vector<NumericType1, Size>& v, const matrix<NumericType2, Size, Cols, OnStack>& m);
+    operator*(const vector<NumericType1, Size>& v, const matrix<NumericType2, Size, Cols, OnStack>& m) {
+        vector<NumericType1, Cols> ret {0};
+
+        return ret;
+    }
 
     template <typename NumericType, index_t Size, typename NumericType2>
     constexpr inline vector<NumericType, Size>
