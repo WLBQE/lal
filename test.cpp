@@ -175,5 +175,8 @@ int main()
     for (auto val : test)
         std::cout << val << ' ';
     std::cout << '\n';
+    for (auto it = test.rbegin(); it != test.rend(); ++it)
+        std::cout << *it << ' ';
+    std::cout << '\n';
     return 0;
 }
