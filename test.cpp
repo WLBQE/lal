@@ -189,5 +189,7 @@ int main()
     std::cout << false_a << '\n';
     std::cout << false_b << '\n';
     std::cout << false_c << '\n';
+    auto false_d = std::move(false_a); // move constructor (implicit)
+    std::cout << false_d << '\n';
     return 0;
 }
