@@ -255,20 +255,30 @@ namespace lal {
     }
 
     template <typename NumericType>
-    std::ostream& operator<<(std::ostream& os, const matrix<NumericType>& m) {
+    std::ostream& operator<<(std::ostream& os, const matrix<NumericType>& _m) {
 
         //std::cout<<"The row size is: "<<m.size()<<std::endl;
         //std::cout<<"The col size is: "<<m[0].size()<<std::endl;
+
+        std::for_each(_m.cbegin(), _m.cend(), [&](const std::vector<NumericType>& _row){
+            std::for_each(_row.cbegin(), _row.cend(), [&](NumericType _value){
+                os<<" "<<_value;
+            });
+            os<<std::endl;
+        });
+        return os;
+        /*
         for (index_t i {0}; i < m.size(); ++i) {
             for (index_t j {0}; j < m[i].size(); ++j)
                 os << " " << m[i][j];
             os << '\n';
         }
-        return os;
+        return os;*/
     }
 
     template <typename NumericType>
-    std::istream& operator>>(std::istream& is, matrix<NumericType>& m) {
+    std::istream& operator>>(std::istream& is, matrix<NumericType>& _m) {
+        /*
         for (auto& val : m) {
             NumericType tmp;
             is >> tmp;
@@ -276,8 +286,13 @@ namespace lal {
                 val = tmp;
             else
                 break;
-        }
-        return is;
+        }*/
+
+        std::for_each(_m.cbegin(), _m.cend(), [&](const std::vector<NumericType>& _row){
+            std::for_each(_row.cbegin(), _row.cend(), [&](NumericType _value){
+                is>>_value;
+            });
+        });        return is;
     }
 
     template <typename NumericType1, typename NumericType2>
