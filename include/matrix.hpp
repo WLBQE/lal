@@ -74,7 +74,7 @@ namespace lal {
         }
 
         template <typename NumericType2, bool OnStack2>
-        operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
+        explicit operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
             matrix<NumericType2, Rows, Cols, OnStack2> ret;
             std::transform(begin(), end(), ret.begin(), [](const value_type& val) -> NumericType2 {
                 return val;
@@ -455,12 +455,19 @@ namespace lal {
             _base->fill(val);
         }
 
+        matrix(const _self& other) : _base {std::make_unique<_base_type>(*other._base)} {}
+
+        _self& operator=(const _self& other) {
+            _base = std::make_unique<_base_type>(*other._base);
+            return *this;
+        }
+
         operator matrix<NumericType, Rows, Cols, !OnStack>() const noexcept {
             return matrix<NumericType, Rows, Cols, !OnStack> {*_base};
         }
 
         template <typename NumericType2, bool OnStack2>
-        operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
+        explicit operator matrix<NumericType2, Rows, Cols, OnStack2>() const {
             matrix<NumericType2, Rows, Cols, OnStack2> ret;
             std::transform(begin(), end(), ret.begin(), [](const value_type& val) -> NumericType2 {
                 return val;
