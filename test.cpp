@@ -132,12 +132,6 @@ int main()
     assert(*it_col4 == 4);
     it_col4 = mat_on_stack.col_crend() - 3;
     assert(*it_col4 == 7);
-    
-
-    
-    return 0;
-
-
 
 
     lal::matrix<int, 32, 32>::col_iterator ci;
@@ -212,5 +206,9 @@ int main()
     std::cout << false_c << '\n';
     auto false_d = std::move(false_a); // move constructor (implicit)
     std::cout << false_d << '\n';
+
+    false_d += false_b;
+    std::cout << false_d << '\n';
+
     return 0;
 }

@@ -764,7 +764,7 @@ namespace lal {
         }
 
         template <typename NumericType2, bool OnStack2>
-        _self& operator+=(matrix<NumericType, Rows, Cols, OnStack2>& m) {
+        _self& operator+=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
             std::transform(begin(), end(), m.begin(), begin(),
                            [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
             return *this;
