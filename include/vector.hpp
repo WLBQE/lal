@@ -31,6 +31,11 @@ namespace lal {
 
         constexpr explicit vector(const value_type& val) noexcept;
 
+        template <typename NumericType2, bool OnStack>
+        constexpr explicit vector(const matrix<NumericType2, 1, Size, OnStack>& mat) noexcept(OnStack) : _base {} {
+            algo::copy(mat.begin(), mat.end(), begin());
+        }
+
         constexpr reference operator[](index_t idx) {
             return _base[idx];
         }
@@ -234,6 +239,28 @@ namespace lal {
     constexpr inline vector<NumericType, Size>
     operator*(const NumericType2& number, const vector<NumericType, Size>& v) {
         return v * number;
+    }
+
+    template <typename NumericType1, index_t Size, typename NumericType2, index_t Cols, bool OnStack>
+    constexpr inline vector<NumericType1, Cols>
+    operator*(const vector<NumericType1, Size>& v, const matrix<NumericType2, Size, Cols, OnStack>& m) {
+        vector<NumericType1, Cols> ret {0};
+        for (index_t i {0}; i < Cols; ++i) {
+            for (index_t j {0}; j < Size; ++j)
+                ret[i] += v[j] * m[i][j];
+        }
+        return ret;
+    }
+
+    template <typename NumericType1, index_t Rows, typename NumericType2, index_t Size, bool OnStack>
+    constexpr inline vector<NumericType1, Rows>
+    operator*(const matrix<NumericType1, Rows, Size, OnStack>& m, const vector<NumericType2, Size>& v) {
+        vector<NumericType1, Rows> ret {0};
+        for (index_t i {0}; i < Rows; ++i) {
+            for (index_t j {0}; j < Size; ++j)
+                ret[i] += m[i][j] * v[j];
+        }
+        return ret;
     }
 
     template <typename NumericType, index_t Size, typename NumericType2>

@@ -80,12 +80,11 @@ int main()
     static_assert(*mat_on_stack.col_begin() == 1);
     static_assert(*(mat_on_stack.col_begin() + 1) == 4);
     auto it_col1 = mat_on_stack.col_begin() + 8;
-    std::cout << *it_col1 << "\n";
+    assert(*it_col1 == 9);
     it_col1 -= 1;
-    std::cout << *it_col1 << "\n";
-    it_col1 = mat_on_stack.col_end() - 1;
-    std::cout << *it_col1 << "\n";
-    return 0;
+    assert(*it_col1 == 6);
+    it_col1 = mat_on_stack.col_end() - 3;
+    assert(*it_col1 == 3);
     
     i = 0;
     for (auto it = mat_on_stack.col_cbegin(); it < mat_on_stack.col_cend(); it++){
@@ -94,6 +93,13 @@ int main()
     }
     static_assert(*mat_on_stack.col_cbegin() == 1);
     static_assert(*(mat_on_stack.col_cbegin() + 1) == 4);
+    auto it_col2 = mat_on_stack.col_cbegin() + 8;
+    assert(*it_col2 == 9);
+    it_col2 --;
+    assert(*it_col2 == 6);
+    it_col2 = mat_on_stack.col_end() - 3;
+    assert(*it_col2 == 3);
+    
 
     i = 8;
     auto it_col = mat_on_stack.col_rbegin();
@@ -104,20 +110,36 @@ int main()
         i--;
     }
     static_assert(*mat_on_stack.col_rbegin() == 9);
-    //static_assert(*(mat_on_stack.col_rbegin() + 2) == 3); //could not pass now
+    static_assert(*(mat_on_stack.col_rbegin() + 2) == 3);
+    auto it_col3 = mat_on_stack.col_rbegin() + 8;
+    assert(*it_col3 == 1);
+    it_col3 --;
+    assert(*it_col3 == 4);
+    it_col3 = mat_on_stack.col_rend() - 3;
+    assert(*it_col3 == 7);
     
+
     i = 8;
     for (auto it = mat_on_stack.col_crbegin(); it < mat_on_stack.col_crend(); it++){
         assert(*it == mat_on_stack[i%3][i/3]);
         i--;
     }
-    static_assert(*mat_on_stack.crbegin() == 9);
-    //static_assert(*(mat_on_stack.crbegin() + 1) == 6);
+    static_assert(*mat_on_stack.col_crbegin() == 9);
+    static_assert(*(mat_on_stack.col_crbegin() + 1) == 6);
+    auto it_col4 = mat_on_stack.col_crbegin() + 8;
+    assert(*it_col4 == 1);
+    it_col4 --;
+    assert(*it_col4 == 4);
+    it_col4 = mat_on_stack.col_crend() - 3;
+    assert(*it_col4 == 7);
+    
 
-
-
-
+    
     return 0;
+
+
+
+
     lal::matrix<int, 32, 32>::col_iterator ci;
     lal::matrix<int, 32, 32>::const_col_iterator cci;
     if (ci == cci && cci == ci)
@@ -173,6 +195,9 @@ int main()
     static_assert(2 * test == add_result);
     for (auto val : test)
         std::cout << val << ' ';
+    std::cout << '\n';
+    for (auto it = test.rbegin(); it != test.rend(); ++it)
+        std::cout << *it << ' ';
     std::cout << '\n';
     return 0;
 }
