@@ -295,16 +295,31 @@ namespace lal {
         });        return is;
     }
 
+
+    template <typename NumericType1, typename NumericType2>
+    constexpr inline std::vector<NumericType1>
+    operator+( std::vector<NumericType1>& _v1,
+              std::vector<NumericType2>& _v2) {
+        std::vector<NumericType1> _result;
+        std::transform(_v1.begin(), _v1.end(), _v2.begin(), std::back_inserter(_result), std::plus<NumericType1>());
+        return _result;
+    }
+
     template <typename NumericType1, typename NumericType2>
     constexpr inline matrix<NumericType1>
-    operator+(const matrix<NumericType1>& m1,
-              const matrix<NumericType2>& m2) {
+    operator+( matrix<NumericType1>& _m1,
+               matrix<NumericType2>& _m2) {
 
-        if(m1.size()!=m2.size() || m1[0].size()!=m2[0].size()){
-            throw std::out_of_range("Index does not match");
+        if(_m1.size()!=_m2.size() || _m1[0].size()!=_m2[0].size()){
+            throw std::logic_error("Index does not match");
         }
 
-        matrix<NumericType1> ret(m1.size(), m1[0].size(), 0);
+        matrix<NumericType1> ret(_m1.size(), _m1[0].size(), 0);
+
+        std::transform(_m1.begin(), _m1.end(), _m2.begin(), ret.begin(), [&](std::vector<NumericType1>& _row1, std::vector<NumericType2>& _row2)->std::vector<NumericType1>{
+
+            return _row1+_row2;
+        });
         //std::cout<<"I am called here"<<std::endl;
         //std::transform(m1.begin(), m1.end(), m2.begin(), ret.begin(),
         //                [](const NumericType1& a, const NumericType2& b) -> NumericType1 { return a + b; });
@@ -314,36 +329,74 @@ namespace lal {
 
 
         // TODO change to transform
+        /*
+        std::transform(m1.begin(), m1.end(), m2.begin(), ret.begin(),
+                       [](std::vector<NumericType1> _row1, std::vector<NumericType2> _row2)->std::vector<NumericType1>{
+                           std::vector<NumericType1> _result(_row1.size(), 0);
+                           std::transform(_row1.begin(), _row1.end(), _row2.begin(), _result.begin(),  std::plus<NumericType1>());
+                           return _result;
+                        });*/
+        /*
         for(index_t i {0}; i < ret.size(); i++){
             for(index_t j {0} ; j <  ret[i].size(); j++){
                 ret[i][j] = m1[i][j]+m2[i][j];
             }
         }
-
+        */
         return ret;
+    }
+
+
+    template <typename NumericType1, typename NumericType2>
+    constexpr inline std::vector<NumericType1>
+    operator-( std::vector<NumericType1>& _v1,
+              std::vector<NumericType2>& _v2) {
+        std::vector<NumericType1> _result;
+        std::transform(_v1.begin(), _v1.end(), _v2.begin(), std::back_inserter(_result), std::minus<NumericType1>());
+        return _result;
     }
 
     template <typename NumericType1, typename NumericType2>
     constexpr inline matrix<NumericType1>
-    operator-(const matrix<NumericType1>& m1,
-              const matrix<NumericType2>& m2) {
+    operator-( matrix<NumericType1>& _m1,
+              matrix<NumericType2>& _m2) {
 
-        if(m1.size()!=m2.size() || m1[0].size()!=m2[0].size()){
-            throw std::out_of_range("Index does not match");
+        if(_m1.size()!=_m2.size() || _m1[0].size()!=_m2[0].size()){
+            throw std::logic_error("Index does not match");
         }
 
-        matrix<NumericType1> ret(m1.size(), m1[0].size(), 0);
+        matrix<NumericType1> ret(_m1.size(), _m1[0].size(), 0);
+
+        std::transform(_m1.begin(), _m1.end(), _m2.begin(), ret.begin(), [&](std::vector<NumericType1>& _row1, std::vector<NumericType2>& _row2)->std::vector<NumericType1>{
+
+            return _row1-_row2;
+        });
+        //std::cout<<"I am called here"<<std::endl;
         //std::transform(m1.begin(), m1.end(), m2.begin(), ret.begin(),
-        //                [](const NumericType1& a, const NumericType2& b) -> NumericType1 { return a - b; });
+        //                [](const NumericType1& a, const NumericType2& b) -> NumericType1 { return a + b; });
 
-        for(index_t i {0}; i < ret.size(); i++){
-            for(index_t j {0} ; j <  ret[i].size(); j++){
-                ret[i][j] = m1[i][j]-m2[i][j];
-            }
-        }
+        //std::transform(m1.begin(), m1.end(), m2.begin(), m2.end(),
+        //            [](const NumericType1& a, const NumericType2& b) -> NumericType1 { return a + b; });
 
+
+        // TODO change to transform
+        /*
+         std::transform(m1.begin(), m1.end(), m2.begin(), ret.begin(),
+         [](std::vector<NumericType1> _row1, std::vector<NumericType2> _row2)->std::vector<NumericType1>{
+         std::vector<NumericType1> _result(_row1.size(), 0);
+         std::transform(_row1.begin(), _row1.end(), _row2.begin(), _result.begin(),  std::plus<NumericType1>());
+         return _result;
+         });*/
+        /*
+         for(index_t i {0}; i < ret.size(); i++){
+         for(index_t j {0} ; j <  ret[i].size(); j++){
+         ret[i][j] = m1[i][j]+m2[i][j];
+         }
+         }
+         */
         return ret;
     }
+
 
     template <typename NumericType1, typename NumericType2>
     constexpr matrix<NumericType1>
