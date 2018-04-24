@@ -198,6 +198,19 @@ int main()
     std::cout << '\n';
     for (auto it = test.rbegin(); it != test.rend(); ++it)
         std::cout << *it << ' ';
-    std::cout << '\n';
+    std::cout << "\n\n";
+
+    lal::matrix<int, 3, 3, false> false_a {{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+    lal::matrix<int, 3, 3, false> false_b {{9, 8, 7, 6, 5, 4, 3, 2, 1}};
+    false_b = false_a; // assignment
+    auto false_c = false_a; // copy constructor
+    false_a[0][0] = 100;
+    false_b[1][1] = 200;
+    false_c[2][2] = 300;
+    std::cout << false_a << '\n';
+    std::cout << false_b << '\n';
+    std::cout << false_c << '\n';
+    auto false_d = std::move(false_a); // move constructor (implicit)
+    std::cout << false_d << '\n';
     return 0;
 }
