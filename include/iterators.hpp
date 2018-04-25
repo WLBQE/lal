@@ -221,9 +221,9 @@ namespace lal {
         }
 
         general_matrix_col_iterator& operator+=(difference_type n) {
-            auto pos = _mat->cols() * _row + _col + n;
-            _row = pos / _mat->cols();
-            _col = pos % _mat->cols();
+            auto pos = _mat->rows() * _col + _row + n;
+            _row = pos % _mat->cols();
+            _col = pos / _mat->cols();
             return *this;
         }
 
@@ -241,27 +241,27 @@ namespace lal {
             return tmp -= n;
         }
 
-        difference_type operator-(const general_matrix_iterator& other) const noexcept {
-            return (_row - other._row) * _mat->cols() + _col - other._col;
+        difference_type operator-(const general_matrix_col_iterator& other) const noexcept {
+            return (_col - other._col) * _mat->rows() + _row - other._row;
         }
 
         difference_type operator-(const _other_it& other) const noexcept {
-            return (_row - other._row) * _mat->cols() + _col - other._col;
+            return (_col - other._col) * _mat->rows() + _row - other._row;
         }
 
         reference operator[](difference_type n) const {
             return *(*this + n);
         }
 
-        bool operator<(const general_matrix_iterator& rhs) const noexcept {
-            return _row == rhs._row ? _col < rhs._col : _row < rhs._row;
+        bool operator<(const general_matrix_col_iterator& rhs) const noexcept {
+            return _col == rhs._col ? _row < rhs._row : _col < rhs._col;
         }
 
         bool operator<(const _other_it & rhs) const noexcept {
-            return _row == rhs._row ? _col < rhs._col : _row < rhs._row;
+            return _col == rhs._col ? _row < rhs._row : _col < rhs._col;
         }
 
-        bool operator>(const general_matrix_iterator& rhs) const noexcept {
+        bool operator>(const general_matrix_col_iterator& rhs) const noexcept {
             return rhs < *this;
         }
 
@@ -269,15 +269,15 @@ namespace lal {
             return rhs < *this;
         }
 
-        bool operator<=(const general_matrix_iterator& rhs) const noexcept {
-            return _row == rhs._row ? _col <= rhs._col : _row < rhs._row;
+        bool operator<=(const general_matrix_col_iterator& rhs) const noexcept {
+            return _col == rhs._col ? _row <= rhs._row : _col < rhs._col;
         }
 
         bool operator<=(const _other_it & rhs) const noexcept {
-            return _row == rhs._row ? _col <= rhs._col : _row < rhs._row;
+            return _col == rhs._col ? _row <= rhs._row : _col < rhs._col;
         }
 
-        bool operator>=(const general_matrix_iterator& rhs) const noexcept {
+        bool operator>=(const general_matrix_col_iterator& rhs) const noexcept {
             return rhs <= *this;
         }
 

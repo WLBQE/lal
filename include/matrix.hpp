@@ -143,68 +143,68 @@ namespace lal {
 
         constexpr col_iterator col_begin() noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base.data(), 0, 0);
+                return col_iterator {_base.data(), 0, 0};
             else
                 return begin();
         }
 
         constexpr const_col_iterator col_begin() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data(), 0, 0);
+                return const_col_iterator {_base.data(), 0, 0};
             else
                 return begin();
         }
 
         constexpr const_col_iterator col_cbegin() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data(), 0, 0);
+                return const_col_iterator {_base.data(), 0, 0};
             else
                 return cbegin();
         }
 
         constexpr col_iterator col_end() noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base.data() + Cols, 0, Cols);
+                return col_iterator {_base.data() + Cols, 0, Cols};
             else
                 return end();
         }
 
         constexpr const_col_iterator col_end() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data() + Cols, 0, Cols);
+                return const_col_iterator {_base.data() + Cols, 0, Cols};
             else
                 return end();
         }
 
         constexpr const_col_iterator col_cend() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data() + Cols, 0, Cols);
+                return const_col_iterator {_base.data() + Cols, 0, Cols};
             else
                 return cend();
         }
 
         constexpr reverse_col_iterator col_rbegin() noexcept {
-            return reverse_col_iterator(col_end());
+            return reverse_col_iterator {col_end()};
         }
 
         constexpr const_reverse_col_iterator col_rbegin() const noexcept {
-            return const_reverse_col_iterator(col_end());
+            return const_reverse_col_iterator {col_end()};
         }
 
         constexpr const_reverse_col_iterator col_crbegin() const noexcept {
-            return const_reverse_col_iterator(col_cend());
+            return const_reverse_col_iterator {col_cend()};
         }
 
         constexpr reverse_col_iterator col_rend() noexcept {
-            return reverse_col_iterator(col_begin());
+            return reverse_col_iterator {col_begin()};
         }
 
         constexpr const_reverse_col_iterator col_rend() const noexcept {
-            return const_reverse_col_iterator(col_begin());
+            return const_reverse_col_iterator {col_begin()};
         }
 
         constexpr const_reverse_col_iterator col_crend() const noexcept {
-            return const_reverse_col_iterator(col_cbegin());
+            return const_reverse_col_iterator {col_cbegin()};
         }
 
         constexpr iterator begin(index_t row) {
@@ -244,34 +244,34 @@ namespace lal {
         }
 
         constexpr reverse_iterator rbegin(index_t row) {
-            return reverse_col_iterator(end(row));
+            return reverse_col_iterator {end(row)};
         }
 
         constexpr const_reverse_iterator rbegin(index_t row) const {
-            return reverse_col_iterator(end(row));
+            return reverse_col_iterator {end(row)};
         }
 
         constexpr const_reverse_iterator crbegin(index_t row) const {
-            return reverse_col_iterator(cend(row));
+            return reverse_col_iterator {cend(row)};
         }
 
         constexpr reverse_iterator rend(index_t row) {
-            return reverse_col_iterator(begin(row));
+            return reverse_col_iterator {begin(row)};
         }
 
         constexpr const_reverse_iterator rend(index_t row) const {
-            return reverse_col_iterator(begin(row));
+            return reverse_col_iterator {begin(row)};
         }
 
         constexpr const_reverse_iterator crend(index_t row) const {
-            return reverse_col_iterator(cbegin(row));
+            return reverse_col_iterator {cbegin(row)};
         }
 
         constexpr col_iterator col_begin(index_t col) {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base.data(), 0, col);
+                return col_iterator {_base.data(), 0, col};
             else
                 return begin() + col;
         }
@@ -280,7 +280,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data(), 0, col);
+                return const_col_iterator {_base.data(), 0, col};
             else
                 return begin() + col;
         }
@@ -289,7 +289,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data(), 0, col);
+                return const_col_iterator {_base.data(), 0, col};
             else
                 return cbegin() + col;
         }
@@ -298,7 +298,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base.data() + Rows * Cols, 0, col + 1);
+                return col_iterator {_base.data() + Rows * Cols, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -307,7 +307,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data() + Rows * Cols, 0, col + 1);
+                return const_col_iterator {_base.data() + Rows * Cols, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -316,33 +316,33 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base.data() + Rows * Cols, 0, col + 1);
+                return const_col_iterator {_base.data() + Rows * Cols, 0, col + 1};
             else
                 return begin() + col + 1;
         }
 
         constexpr reverse_col_iterator col_rbegin(index_t col) {
-            return reverse_col_iterator(col_end(col));
+            return reverse_col_iterator {col_end(col)};
         }
 
         constexpr const_reverse_col_iterator col_rbegin(index_t col) const {
-            return const_reverse_col_iterator(col_end(col));
+            return const_reverse_col_iterator {col_end(col)};
         }
 
         constexpr const_reverse_col_iterator col_crbegin(index_t col) const {
-            return const_reverse_col_iterator(col_cend(col));
+            return const_reverse_col_iterator {col_cend(col)};
         }
 
         constexpr reverse_col_iterator col_rend(index_t col) {
-            return reverse_col_iterator(col_begin(col));
+            return reverse_col_iterator {col_begin(col)};
         }
 
         constexpr const_reverse_col_iterator col_rend(index_t col) const {
-            return const_reverse_col_iterator(col_begin(col));
+            return const_reverse_col_iterator {col_begin(col)};
         }
 
         constexpr const_reverse_col_iterator col_crend(index_t col) const {
-            return const_reverse_col_iterator(col_cbegin(col));
+            return const_reverse_col_iterator {col_cbegin(col)};
         }
 
         void swap(matrix& other) noexcept {
@@ -542,68 +542,68 @@ namespace lal {
 
         col_iterator col_begin() noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base->data(), 0, 0);
+                return col_iterator {_base->data(), 0, 0};
             else
                 return begin();
         }
 
         const_col_iterator col_begin() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data(), 0, 0);
+                return const_col_iterator {_base->data(), 0, 0};
             else
                 return begin();
         }
 
         const_col_iterator col_cbegin() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data(), 0, 0);
+                return const_col_iterator {_base->data(), 0, 0};
             else
                 return cbegin();
         }
 
         col_iterator col_end() noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base->data() + Cols, 0, Cols);
+                return col_iterator {_base->data() + Cols, 0, Cols};
             else
                 return end();
         }
 
         const_col_iterator col_end() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data() + Cols, 0, Cols);
+                return const_col_iterator {_base->data() + Cols, 0, Cols};
             else
                 return end();
         }
 
         const_col_iterator col_cend() const noexcept {
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data() + Cols, 0, Cols);
+                return const_col_iterator {_base->data() + Cols, 0, Cols};
             else
                 return cend();
         }
 
         reverse_col_iterator col_rbegin() noexcept {
-            return reverse_col_iterator(col_end());
+            return reverse_col_iterator {col_end()};
         }
 
         const_reverse_col_iterator col_rbegin() const noexcept {
-            return const_reverse_col_iterator(col_end());
+            return const_reverse_col_iterator {col_end()};
         }
 
         const_reverse_col_iterator col_crbegin() const noexcept {
-            return const_reverse_col_iterator(col_cend());
+            return const_reverse_col_iterator {col_cend()};
         }
 
         reverse_col_iterator col_rend() noexcept {
-            return reverse_col_iterator(col_begin());
+            return reverse_col_iterator {col_begin()};
         }
 
         const_reverse_col_iterator col_rend() const noexcept {
-            return const_reverse_col_iterator(col_begin());
+            return const_reverse_col_iterator {col_begin()};
         }
 
         const_reverse_col_iterator col_crend() const noexcept {
-            return const_reverse_col_iterator(col_cbegin());
+            return const_reverse_col_iterator {col_cbegin()};
         }
 
         iterator begin(index_t row) {
@@ -643,34 +643,34 @@ namespace lal {
         }
 
         reverse_iterator rbegin(index_t row) {
-            return reverse_col_iterator(end(row));
+            return reverse_col_iterator {end(row)};
         }
 
         const_reverse_iterator rbegin(index_t row) const {
-            return reverse_col_iterator(end(row));
+            return reverse_col_iterator {end(row)};
         }
 
         const_reverse_iterator crbegin(index_t row) const {
-            return reverse_col_iterator(cend(row));
+            return reverse_col_iterator {cend(row)};
         }
 
         reverse_iterator rend(index_t row) {
-            return reverse_col_iterator(begin(row));
+            return reverse_col_iterator {begin(row)};
         }
 
         const_reverse_iterator rend(index_t row) const {
-            return reverse_col_iterator(begin(row));
+            return reverse_col_iterator {begin(row)};
         }
 
         const_reverse_iterator crend(index_t row) const {
-            return reverse_col_iterator(cbegin(row));
+            return reverse_col_iterator {cbegin(row)};
         }
 
         col_iterator col_begin(index_t col) {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base->data(), 0, col);
+                return col_iterator {_base->data(), 0, col};
             else
                 return begin() + col;
         }
@@ -679,7 +679,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data(), 0, col);
+                return const_col_iterator {_base->data(), 0, col};
             else
                 return begin() + col;
         }
@@ -688,7 +688,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data(), 0, col);
+                return const_col_iterator {_base->data(), 0, col};
             else
                 return cbegin() + col;
         }
@@ -697,7 +697,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator(_base->data() + Rows * Cols, 0, col + 1);
+                return col_iterator {_base->data() + Rows * Cols, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -706,7 +706,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data() + Rows * Cols, 0, col + 1);
+                return const_col_iterator {_base->data() + Rows * Cols, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -715,33 +715,33 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range("column number out of range");
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator(_base->data() + Rows * Cols, 0, col + 1);
+                return const_col_iterator {_base->data() + Rows * Cols, 0, col + 1};
             else
                 return begin() + col + 1;
         }
 
         reverse_col_iterator col_rbegin(index_t col) {
-            return reverse_col_iterator(col_end(col));
+            return reverse_col_iterator {col_end(col)};
         }
 
         const_reverse_col_iterator col_rbegin(index_t col) const {
-            return const_reverse_col_iterator(col_end(col));
+            return const_reverse_col_iterator {col_end(col)};
         }
 
         const_reverse_col_iterator col_crbegin(index_t col) const {
-            return const_reverse_col_iterator(col_cend(col));
+            return const_reverse_col_iterator {col_cend(col)};
         }
 
         reverse_col_iterator col_rend(index_t col) {
-            return reverse_col_iterator(col_begin(col));
+            return reverse_col_iterator {col_begin(col)};
         }
 
         const_reverse_col_iterator col_rend(index_t col) const {
-            return const_reverse_col_iterator(col_begin(col));
+            return const_reverse_col_iterator {col_begin(col)};
         }
 
         const_reverse_col_iterator col_crend(index_t col) const {
-            return const_reverse_col_iterator(col_cbegin(col));
+            return const_reverse_col_iterator {col_cbegin(col)};
         }
 
         void swap(matrix& other) noexcept {
@@ -964,10 +964,6 @@ namespace lal {
         auto new_pos = _col * Rows + _row + n;
         _row = new_pos % Rows;
         _col = new_pos / Rows;
-        if (_row < 0) {
-            --_col;
-            _row += Rows;
-        }
         _ptr += _row * Cols + _col;
         return *this;
     }
