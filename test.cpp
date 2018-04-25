@@ -1,7 +1,8 @@
+#include <cassert>
 #include <iostream>
-#include <array>
-#include <assert.h>
+
 #include "include/matrix.hpp"
+#include "include/dmatrix.hpp"
 
 lal::matrix<int, 3, 3> foo() {
     return lal::matrix<int, 3, 3> {2};
@@ -209,6 +210,9 @@ int main()
 
     false_d += false_b;
     std::cout << false_d << '\n';
+
+    lal::dynamic_matrix<int> dm {false_a};
+    std::cout << dm << '\n';
 
     return 0;
 }
