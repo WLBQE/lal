@@ -1,6 +1,11 @@
 #ifndef LAL_VECTOR_HPP
 #define LAL_VECTOR_HPP
 
+#include <array>
+#include <iostream>
+#include <stdexcept>
+
+#include "basics.hpp"
 #include "matrix.hpp"
 #include "constexpr_algorithm.hpp"
 
@@ -8,8 +13,6 @@ namespace lal {
     template <typename NumericType, index_t Size>
     class vector{
         using _base_type = std::array<NumericType, Size>;
-        using _self = vector<NumericType, Size>;
-
         _base_type _base;
 
     public:
@@ -104,7 +107,7 @@ namespace lal {
             return _base.crend();
         }
 
-        void swap(_self& other) noexcept {
+        void swap(vector& other) noexcept {
             _base.swap(other._base);
         }
 
@@ -121,21 +124,21 @@ namespace lal {
         }
 
         template <typename NumericType2>
-        constexpr _self& operator+=(vector<NumericType2, Size>& v) {
+        constexpr vector& operator+=(vector<NumericType2, Size>& v) {
             algo::transform(begin(), end(), v.begin(), begin(),
                             [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
             return *this;
         }
 
         template <typename NumericType2>
-        constexpr _self& operator-=(vector<NumericType2, Size>& v) {
+        constexpr vector& operator-=(vector<NumericType2, Size>& v) {
             algo::transform(begin(), end(), v.begin(), begin(),
                             [](const NumericType& a, const NumericType2& b) -> NumericType { return a - b; });
             return *this;
         }
 
         template <typename NumericType2>
-        constexpr _self& operator*=(const NumericType2& num) {
+        constexpr vector& operator*=(const NumericType2& num) {
             algo::transform(begin(), end(), begin(), [num](const NumericType& a) -> NumericType {
                 return a * num;
             });
@@ -143,7 +146,7 @@ namespace lal {
         }
 
         template <typename NumericType2>
-        constexpr _self& operator/=(const NumericType2& num) {
+        constexpr vector& operator/=(const NumericType2& num) {
             algo::transform(begin(), end(), begin(), [num](const NumericType& a) -> NumericType {
                 return a / num;
             });
