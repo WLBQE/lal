@@ -1,0 +1,9 @@
+CXX=g++-7
+CXXFLAGS=-std=c++17 -O2 -Wall -Wextra -pedantic
+
+test_matrix_on_stack: test_matrix_on_stack.cpp include/matrix.hpp include/constexpr_algorithm.hpp
+	$(CXX) -o test_matrix_on_stack $(CXXFLAGS) test_matrix_on_stack.cpp
+
+.PHONY: clean
+clean:
+	rm -f test_matrix_on_stack
