@@ -7,6 +7,7 @@
 
 #include "basics.hpp"
 #include "matrix.hpp"
+#include "dmatrix.hpp"
 #include "constexpr_algorithm.hpp"
 
 namespace lal {
@@ -28,14 +29,14 @@ namespace lal {
         typedef typename _base_type::difference_type difference_type;
         typedef typename _base_type::size_type size_type;
 
-        constexpr vector() : _base {} {}
+        constexpr vector() : _base() {}
 
-        constexpr explicit vector(_base_type init) noexcept : _base {init} {}
+        constexpr explicit vector(_base_type init) noexcept : _base(init) {}
 
         constexpr explicit vector(const value_type& val) noexcept;
 
         template <typename NumericType2, bool OnStack>
-        constexpr explicit vector(const matrix<NumericType2, 1, Size, OnStack>& mat) noexcept(OnStack) : _base {} {
+        constexpr explicit vector(const matrix<NumericType2, 1, Size, OnStack>& mat) noexcept(OnStack) : _base() {
             algo::copy(mat.begin(), mat.end(), begin());
         }
 

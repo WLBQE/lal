@@ -183,7 +183,7 @@ int main()
     static_assert(test.transpose() == test_t);
     static_assert(test + test == add_result);
     static_assert(test - test == zeros);
-    static_assert((lal::make_identity<2, int>() *= 2) == lal::square_matrix<int, 2> {{2, 0, 0, 2}});
+    static_assert((lal::make_identity<2, int>() * 2) == lal::square_matrix<int, 2> {{2, 0, 0, 2}});
     static_assert(test * 2 == add_result);
     static_assert(test / 1 == test);
     static_assert(test * test_t == mult_result);
@@ -213,6 +213,12 @@ int main()
 
     lal::dynamic_matrix<int> dm {false_a};
     std::cout << dm << '\n';
+
+    auto iden = lal::make_identity<5, int>();
+    iden *= 2;
+    std::cout << iden << '\n';
+    std::cout << -iden << '\n';
+    std::cout << lal::make_dynamic_identity(5, 8) << '\n';
 
     return 0;
 }
