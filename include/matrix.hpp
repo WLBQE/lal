@@ -244,27 +244,27 @@ namespace lal {
         }
 
         constexpr reverse_iterator rbegin(index_t row) {
-            return reverse_col_iterator {end(row)};
+            return reverse_iterator {end(row)};
         }
 
         constexpr const_reverse_iterator rbegin(index_t row) const {
-            return reverse_col_iterator {end(row)};
+            return const_reverse_iterator {end(row)};
         }
 
         constexpr const_reverse_iterator crbegin(index_t row) const {
-            return reverse_col_iterator {cend(row)};
+            return const_reverse_iterator {cend(row)};
         }
 
         constexpr reverse_iterator rend(index_t row) {
-            return reverse_col_iterator {begin(row)};
+            return reverse_iterator {begin(row)};
         }
 
         constexpr const_reverse_iterator rend(index_t row) const {
-            return reverse_col_iterator {begin(row)};
+            return const_reverse_iterator {begin(row)};
         }
 
         constexpr const_reverse_iterator crend(index_t row) const {
-            return reverse_col_iterator {cbegin(row)};
+            return const_reverse_iterator {cbegin(row)};
         }
 
         constexpr col_iterator col_begin(index_t col) {
@@ -372,14 +372,14 @@ namespace lal {
         template <typename NumericType2, bool OnStack2>
         constexpr matrix& operator+=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
             algo::transform(begin(), end(), m.begin(), begin(),
-                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
+                            [](const NumericType& a, const NumericType2& b) -> NumericType { return a + b; });
             return *this;
         }
 
         template <typename NumericType2, bool OnStack2>
         constexpr matrix& operator-=(matrix<NumericType2, Rows, Cols, OnStack2>& m) {
             algo::transform(begin(), end(), m.begin(), begin(),
-                           [](const NumericType& a, const NumericType2& b) -> NumericType { return a - b; });
+                            [](const NumericType& a, const NumericType2& b) -> NumericType { return a - b; });
             return *this;
         }
 
@@ -643,27 +643,27 @@ namespace lal {
         }
 
         reverse_iterator rbegin(index_t row) {
-            return reverse_col_iterator {end(row)};
+            return reverse_iterator {end(row)};
         }
 
         const_reverse_iterator rbegin(index_t row) const {
-            return reverse_col_iterator {end(row)};
+            return const_reverse_iterator {end(row)};
         }
 
         const_reverse_iterator crbegin(index_t row) const {
-            return reverse_col_iterator {cend(row)};
+            return const_reverse_iterator {cend(row)};
         }
 
         reverse_iterator rend(index_t row) {
-            return reverse_col_iterator {begin(row)};
+            return reverse_iterator {begin(row)};
         }
 
         const_reverse_iterator rend(index_t row) const {
-            return reverse_col_iterator {begin(row)};
+            return const_reverse_iterator {begin(row)};
         }
 
         const_reverse_iterator crend(index_t row) const {
-            return reverse_col_iterator {cbegin(row)};
+            return const_reverse_iterator {cbegin(row)};
         }
 
         col_iterator col_begin(index_t col) {
@@ -830,6 +830,10 @@ namespace lal {
         constexpr matrix_col_iterator(pointer ptr, index_t row, index_t col) noexcept
                 : _row {row}, _col {col}, _ptr {ptr} {}
 
+        template <typename T, typename = std::enable_if_t<IsConst, T>>
+        constexpr matrix_col_iterator(const matrix_col_iterator<NumericType, Rows, Cols, OnStack, !IsConst>& other)
+                noexcept : _row {other._row}, _col {other._col}, _ptr {other._ptr} {}
+
         constexpr reference operator*() const {
             return *_ptr;
         }
@@ -959,7 +963,7 @@ namespace lal {
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, bool IsConst>
     constexpr matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>&
     matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>::
-            operator+=(matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>::difference_type n) noexcept {
+    operator+=(matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>::difference_type n) noexcept {
         _ptr -= _row * Cols + _col;
         auto new_pos = _col * Rows + _row + n;
         _row = new_pos % Rows;
