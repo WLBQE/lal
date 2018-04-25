@@ -237,6 +237,45 @@ namespace lal {
             std::copy(begin(), end(), ret.col_begin());
             return ret;
         }
+
+        void insertRow(const std::vector<NumericType>& _row){
+            if((*_base)[0].size()!=_row.size()){
+                throw std::logic_error("Row size mismatch error");
+                return ;
+            }
+            (*_base).push_back(_row);
+            return ;
+        }
+
+        void insertColumn(const std::vector<NumericType>& _column){
+            if((*_base).size()!=_column.size()){
+                throw std::logic_error("Column size mismatch error");
+                return ;
+            }
+            std::transform((*_base).begin(), (*_base).end(), _column.begin(), (*_base).begin(), [&](std::vector<NumericType>& _row, NumericType newValue)->std::vector<NumericType>&{
+                _row.push_back(newValue);
+                return _row;});
+        }
+
+        void deleteRow(index_t _rowId){
+            if((*_base).size()<=_rowId){
+                throw std::out_of_range("Row id out of range");
+            }
+            (*_base).erase(begin()+_rowId);
+            return ;
+        }
+
+        void deleteCol(index_t _colId){
+            if((*_base)[0].size()<=_colId){
+                throw std::out_of_range("Column id out of range");
+            }
+
+            std::for_each(begin(), end(), [&](std::vector<NumericType>& _row){
+                _row.erase(_row.begin()+_colId);
+            });
+            return ;
+        }
+
     };
 
 
