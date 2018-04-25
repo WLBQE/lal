@@ -10,7 +10,7 @@ namespace lal {
     class general_matrix_iterator {
         using _other_it = general_matrix_iterator<Matrix, !IsConst>;
         friend class general_matrix_iterator<Matrix, !IsConst>;
-        Matrix* _mat;
+        Matrix* const _mat;
         index_t _row;
         index_t _col;
 
