@@ -774,7 +774,7 @@ namespace lal {
             return Rows * Cols == 0;
         }
 
-        constexpr const matrix operator-() const {
+        constexpr matrix operator-() const {
             matrix ret;
             algo::transform(begin(), end(), ret.begin(), [](const NumericType& num) -> NumericType { return -num; });
             return ret;
@@ -986,7 +986,7 @@ namespace lal {
     }
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, bool IsConst>
-    constexpr inline const matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>
+    constexpr inline matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>
     operator+(typename matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst>::difference_type n,
               matrix_col_iterator<NumericType, Rows, Cols, OnStack, IsConst> it) noexcept {
         return it + n;
@@ -1007,7 +1007,7 @@ namespace lal {
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
-    constexpr inline const matrix<NumericType1, Rows, Cols, OnStack1>
+    constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
     operator+(const matrix<NumericType1, Rows, Cols, OnStack1>& m1,
               const matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
         matrix<NumericType1, Rows, Cols, OnStack1> ret;
@@ -1017,7 +1017,7 @@ namespace lal {
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack1, bool OnStack2>
-    constexpr inline const matrix<NumericType1, Rows, Cols, OnStack1>
+    constexpr inline matrix<NumericType1, Rows, Cols, OnStack1>
     operator-(const matrix<NumericType1, Rows, Cols, OnStack1>& m1,
               const matrix<NumericType2, Rows, Cols, OnStack2>& m2) {
         matrix<NumericType1, Rows, Cols, OnStack1> ret;
@@ -1028,7 +1028,7 @@ namespace lal {
 
     template <typename NumericType1, typename NumericType2,
             index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
-    constexpr const matrix<NumericType1, Rows1, Cols2, OnStack1>
+    constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
     operator*(const matrix<NumericType1, Rows1, Cols1, OnStack1>& m1,
               const matrix<NumericType2, Cols1, Cols2, OnStack2>& m2) {
         matrix<NumericType1, Rows1, Cols2, OnStack1> ret {0};
@@ -1042,7 +1042,7 @@ namespace lal {
     }
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
-    constexpr inline const matrix<NumericType, Rows, Cols, OnStack>
+    constexpr inline matrix<NumericType, Rows, Cols, OnStack>
     operator*(const matrix<NumericType, Rows, Cols, OnStack>& m, const NumericType2& number) {
         matrix<NumericType, Rows, Cols, OnStack> ret;
         algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType& a) -> NumericType {
@@ -1052,13 +1052,13 @@ namespace lal {
     }
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
-    constexpr inline const matrix<NumericType, Rows, Cols, OnStack>
+    constexpr inline matrix<NumericType, Rows, Cols, OnStack>
     operator*(const NumericType2& number, const matrix<NumericType, Rows, Cols, OnStack>& m) {
         return m * number;
     }
 
     template <typename NumericType, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
-    constexpr inline const matrix<NumericType, Rows, Cols, OnStack>
+    constexpr inline matrix<NumericType, Rows, Cols, OnStack>
     operator/(const matrix<NumericType, Rows, Cols, OnStack>& m, const NumericType2& number) {
         matrix<NumericType, Rows, Cols, OnStack> ret;
         algo::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType& a) -> NumericType {
@@ -1069,7 +1069,7 @@ namespace lal {
 
     template <index_t Size, typename NumericType = double,
             bool OnStack = Size * Size * sizeof(NumericType) < _stack_threshold>
-    constexpr const matrix<NumericType, Size, Size, OnStack>
+    constexpr matrix<NumericType, Size, Size, OnStack>
     make_identity(const NumericType& one = 1, const NumericType& zero = 0) noexcept(OnStack) {
         matrix<NumericType, Size, Size, OnStack> ret {zero};
         for (index_t i {0}; i < Size; ++i)

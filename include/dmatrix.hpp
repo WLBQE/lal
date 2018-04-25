@@ -2,12 +2,12 @@
 #define LAL_DMATRIX_HPP
 
 #include <algorithm>
-#include <vector>
 #include <limits>
 #include <memory>
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
+#include <vector>
 
 #include "basics.hpp"
 #include "matrix.hpp"
@@ -18,7 +18,7 @@ namespace lal {
     class dynamic_matrix;
 
     template <typename NumericType1, typename NumericType2>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator*(const dynamic_matrix<NumericType1>& m1, const dynamic_matrix<NumericType2>& m2);
 
     template <typename NumericType>
@@ -335,7 +335,7 @@ namespace lal {
             return rows() * cols() == 0;
         }
 
-        const dynamic_matrix operator-() const {
+        dynamic_matrix operator-() const {
             dynamic_matrix ret {rows(), cols()};
             algo::transform(begin(), end(), ret.begin(), [](const NumericType& num) -> NumericType { return -num; });
             return ret;
@@ -384,10 +384,27 @@ namespace lal {
         }
 
         dynamic_matrix<NumericType> transpose() const {
-            dynamic_matrix<NumericType> ret;
+            dynamic_matrix<NumericType> ret {cols(), rows()};
             std::copy(begin(), end(), ret.col_begin());
             return ret;
         }
+
+        void insert_row(index_t pos, std::vector<NumericType> row) {
+            if (pos > rows())
+                throw std::out_of_range {"invalid insert position"};
+            if (row.size() != cols())
+                throw std::length_error {"invalid row length"};
+            _base.insert(_base.begin() + pos, row);
+        }
+
+        void erase_row(index_t pos) {
+            if (pos >= rows())
+                throw std::out_of_range {"invalid erase position"};
+            _base.erase(_base.begin() + pos);
+        }
+
+        void insert_column(index_t pos, std::vector<NumericType> col);
+        void erase_column(index_t pos);
     };
 
     template <typename NumericType1, typename NumericType2>
@@ -400,8 +417,26 @@ namespace lal {
         return !(lhs == rhs);
     }
 
+    template <typename NumericType>
+    void dynamic_matrix<NumericType>::insert_column(index_t pos, std::vector<NumericType> col) {
+        if (pos > cols())
+            throw std::out_of_range {"invalid insert position"};
+        if (col.size() != rows())
+            throw std::length_error {"invalid column length"};
+        for (index_t i {0}; i < rows(); ++i)
+            _base[i].insert(_base[i].begin() + pos, col[i]);
+    }
+
+    template <typename NumericType>
+    void dynamic_matrix<NumericType>::erase_column(index_t pos) {
+        if (pos >= cols())
+            throw std::out_of_range {"invalid erase position"};
+        for (auto& row : _base)
+            row.erase(row.begin() + pos);
+    }
+
     template <typename NumericType1, typename NumericType2>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator+(const dynamic_matrix<NumericType1>& m1, const dynamic_matrix<NumericType2>& m2) {
         if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
             throw std::logic_error {"matrix dimensions do not match"};
@@ -412,7 +447,7 @@ namespace lal {
     };
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator+(const dynamic_matrix<NumericType1>& m1, const matrix<NumericType2, Rows, Cols, OnStack>& m2) {
         if (m1.rows() != Rows || m1.cols() != Cols)
             throw std::logic_error {"matrix dimensions do not match"};
@@ -423,7 +458,7 @@ namespace lal {
     };
 
     template <typename NumericType1, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
-    const matrix<NumericType1, Rows, Cols, OnStack>
+    matrix<NumericType1, Rows, Cols, OnStack>
     operator+(const matrix<NumericType2, Rows, Cols, OnStack>& m1, const dynamic_matrix<NumericType2>& m2) {
         if (m2.rows() != Rows || m2.cols() != Cols)
             throw std::logic_error {"matrix dimensions do not match"};
@@ -434,7 +469,7 @@ namespace lal {
     };
 
     template <typename NumericType1, typename NumericType2>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator-(const dynamic_matrix<NumericType1>& m1, const dynamic_matrix<NumericType2>& m2) {
         if (m1.rows() != m2.rows() || m1.cols() != m2.cols())
             throw std::logic_error {"matrix dimensions do not match"};
@@ -445,7 +480,7 @@ namespace lal {
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator-(const dynamic_matrix<NumericType1>& m1, const matrix<NumericType2, Rows, Cols, OnStack>& m2) {
         if (m1.rows() != Rows || m1.cols() != Cols)
             throw std::logic_error {"matrix dimensions do not match"};
@@ -456,7 +491,7 @@ namespace lal {
     };
 
     template <typename NumericType1, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
-    const matrix<NumericType1, Rows, Cols, OnStack>
+    matrix<NumericType1, Rows, Cols, OnStack>
     operator-(const matrix<NumericType2, Rows, Cols, OnStack>& m1, const dynamic_matrix<NumericType2>& m2) {
         if (m2.rows() != Rows || m2.cols() != Cols)
             throw std::logic_error {"matrix dimensions do not match"};
@@ -467,7 +502,7 @@ namespace lal {
     };
 
     template <typename NumericType1, typename NumericType2>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator*(const dynamic_matrix<NumericType1>& m1, const dynamic_matrix<NumericType2>& m2) {
         if (m1.cols() != m2.rows())
             throw std::logic_error {"matrix dimensions do not match"};
@@ -482,7 +517,7 @@ namespace lal {
     }
 
     template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack>
-    const dynamic_matrix<NumericType1>
+    dynamic_matrix<NumericType1>
     operator*(const dynamic_matrix<NumericType1>& m1, const matrix<NumericType2, Rows, Cols, OnStack>& m2) {
         if (m1.cols() != Rows)
             throw std::logic_error {"matrix dimensions do not match"};
@@ -496,9 +531,9 @@ namespace lal {
         return ret;
     };
 
-    template <typename NumericType1, typename NumericType2, index_t Rows, index_t Cols, bool OnStack>
-    const dynamic_matrix<NumericType1>
-    operator*(const matrix<NumericType2, Rows, Cols, OnStack>& m1, const dynamic_matrix<NumericType1>& m2) {
+    template <typename NumericType1, index_t Rows, index_t Cols, bool OnStack, typename NumericType2>
+    dynamic_matrix<NumericType1>
+    operator*(const matrix<NumericType1, Rows, Cols, OnStack>& m1, const dynamic_matrix<NumericType2>& m2) {
         if (Cols != m2.rows())
             throw std::logic_error {"matrix dimensions do not match"};
         dynamic_matrix<NumericType1> ret {Rows, m2.cols(), 0};
@@ -512,7 +547,7 @@ namespace lal {
     };
 
     template <typename NumericType, typename NumericType2>
-    const dynamic_matrix<NumericType> operator*(const dynamic_matrix<NumericType>& m, const NumericType2& number) {
+    dynamic_matrix<NumericType> operator*(const dynamic_matrix<NumericType>& m, const NumericType2& number) {
         dynamic_matrix<NumericType> ret {m.rows(), m.cols()};
         std::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType& a) -> NumericType {
             return a * number;
@@ -521,12 +556,12 @@ namespace lal {
     }
 
     template <typename NumericType, typename NumericType2>
-    const dynamic_matrix<NumericType> operator*(const NumericType2& number, const dynamic_matrix<NumericType>& m) {
+    dynamic_matrix<NumericType> operator*(const NumericType2& number, const dynamic_matrix<NumericType>& m) {
         return m * number;
     }
 
     template <typename NumericType, typename NumericType2>
-    const dynamic_matrix<NumericType> operator/(const dynamic_matrix<NumericType>& m, const NumericType2& number) {
+    dynamic_matrix<NumericType> operator/(const dynamic_matrix<NumericType>& m, const NumericType2& number) {
         dynamic_matrix<NumericType> ret {m.rows(), m.cols()};
         std::transform(m.begin(), m.end(), ret.begin(), [number](const NumericType& a) -> NumericType {
             return a / number;
@@ -535,7 +570,7 @@ namespace lal {
     }
 
     template <typename NumericType>
-    const dynamic_matrix<NumericType>
+    dynamic_matrix<NumericType>
     make_dynamic_identity(index_t size, const NumericType& one = 1, const NumericType& zero = 0) {
         dynamic_matrix<NumericType> ret {size, size, zero};
         for (index_t i {0}; i < size; ++i)
