@@ -38,10 +38,22 @@ void test_matrix_on_stack()
         i++;
     }
     static_assert(*mat_on_stack.begin() == 1);
-    static_assert(*mat_on_stack.begin()+1 == 2);
+    static_assert(*mat_on_stack.begin() + 1 == 2);
     constexpr int num = *mat_on_stack.begin();
     assert(num == 1);
-
+    auto it0 = mat_on_stack.begin(1);
+    assert(*it0 == 4);
+    it0 += 2;
+    assert(*it0 == 6);
+    it0--;
+    assert(*it0 == 5);
+    it0 -= 2;
+    assert(*it0 == 3);
+    it0++;
+    assert(*it0 == 4);
+    it0 = mat_on_stack.end(1);
+    assert(*it0 == 7);
+    
     i = 1;
     for (auto it = mat_on_stack.cbegin(); it < mat_on_stack.cend(); it++){
         assert(*it == i);
@@ -50,17 +62,39 @@ void test_matrix_on_stack()
     static_assert(*mat_on_stack.cbegin() == 1);
     static_assert(*(mat_on_stack.cbegin() + 1) == 2);
 
-    i = 9;
-    auto it1 = mat_on_stack.rbegin();
+    auto it1 = mat_on_stack.cbegin(1);
+    assert(*it1 == 4);
+    it1 += 2;
+    assert(*it1 == 6);
+    it1--;
+    assert(*it1 == 5);
+    it1 -= 2;
+    assert(*it1 == 3);
     it1++;
-    assert(*it1 == 8);
+    assert(*it1 == 4);
+    it1 = mat_on_stack.cend(1);
+    assert(*it1 == 7);
+ 
+    i = 9;
     for (auto it = mat_on_stack.rbegin(); it < mat_on_stack.rend(); it++){
         assert(*it == i);
         i--;
     }
     static_assert(*mat_on_stack.rbegin() == 9);
     static_assert(*(mat_on_stack.rbegin() + 2) == 7);
-    
+    auto it2 = mat_on_stack.rbegin(1);
+    assert(*it2 == 6);
+    it2 += 2;
+    assert(*it2 == 4);
+    it2--;
+    assert(*it2 == 5);
+    it2 -= 2;
+    assert(*it2 == 7);
+    it2++;
+    assert(*it2 == 6);
+    it2 = mat_on_stack.rend(1);
+    assert(*it2 == 3);
+
     i = 9;
     for (auto it = mat_on_stack.crbegin(); it < mat_on_stack.crend(); it++){
         assert(*it == i);
@@ -68,6 +102,20 @@ void test_matrix_on_stack()
     }
     static_assert(*mat_on_stack.crbegin() == 9);
     static_assert(*(mat_on_stack.crbegin() + 1) == 8);
+    
+    auto it3 = mat_on_stack.crbegin(1);
+    assert(*it3 == 6);
+    it3 += 2;
+    assert(*it3 == 4);
+    it3--;
+    assert(*it3 == 5);
+    it3 -= 2;
+    assert(*it3 == 7);
+    it3++;
+    assert(*it3 == 6);
+    it3 = mat_on_stack.rend(1);
+    assert(*it3 == 3);
+
 
     //column iterator
     i = 0;
@@ -83,7 +131,20 @@ void test_matrix_on_stack()
     assert(*it_col1 == 6);
     it_col1 = mat_on_stack.col_end() - 3;
     assert(*it_col1 == 3);
+    it_col1 = mat_on_stack.col_begin(1);
+    assert(*it_col1 == 2);
+    it_col1 += 2;
+    assert(*it_col1 == 8);
+    it_col1--;
+    assert(*it_col1 == 5);
+    it_col1 -= 2;
+    assert(*it_col1 == 7);
+    it_col1++;
+    assert(*it_col1 == 2);
+    it_col1 = mat_on_stack.col_end(1);
+    assert(*it_col1 == 3);
     
+
     i = 0;
     for (auto it = mat_on_stack.col_cbegin(); it < mat_on_stack.col_cend(); it++){
         assert(*it == mat_on_stack[i%3][i/3]);
@@ -95,9 +156,22 @@ void test_matrix_on_stack()
     assert(*it_col2 == 9);
     it_col2 --;
     assert(*it_col2 == 6);
-    it_col2 = mat_on_stack.col_end() - 3;
+    it_col2 = mat_on_stack.col_cend() - 3;
+    assert(*it_col2 == 3);
+    it_col2 = mat_on_stack.col_cbegin(1);
+    assert(*it_col2 == 2);
+    it_col2 += 2;
+    assert(*it_col2 == 8);
+    it_col2--;
+    assert(*it_col2 == 5);
+    it_col2 -= 2;
+    assert(*it_col2 == 7);
+    it_col2++;
+    assert(*it_col2 == 2);
+    it_col2 = mat_on_stack.col_cend(1);
     assert(*it_col2 == 3);
     
+
 
     i = 8;
     auto it_col = mat_on_stack.col_rbegin();
@@ -115,7 +189,21 @@ void test_matrix_on_stack()
     assert(*it_col3 == 4);
     it_col3 = mat_on_stack.col_rend() - 3;
     assert(*it_col3 == 7);
+    it_col3 = mat_on_stack.col_rbegin(1);
+    assert(*it_col3 == 8);
+    it_col3 += 2;
+    assert(*it_col3 == 2);
+    it_col3--;
+    assert(*it_col3 == 5);
+    it_col3 -= 2;
+    assert(*it_col3 == 3);
+    it_col3++;
+    assert(*it_col3 == 8);
+    it_col3 = mat_on_stack.col_rend(1);
+    assert(*it_col3 == 7);
     
+
+
 
     i = 8;
     for (auto it = mat_on_stack.col_crbegin(); it < mat_on_stack.col_crend(); it++){
@@ -130,6 +218,20 @@ void test_matrix_on_stack()
     assert(*it_col4 == 4);
     it_col4 = mat_on_stack.col_crend() - 3;
     assert(*it_col4 == 7);
+    it_col4 = mat_on_stack.col_crbegin(1);
+    assert(*it_col4 == 8);
+    it_col4 += 2;
+    assert(*it_col4 == 2);
+    it_col4--;
+    assert(*it_col4 == 5);
+    it_col4 -= 2;
+    assert(*it_col4 == 3);
+    it_col4++;
+    assert(*it_col4 == 8);
+    it_col4 = mat_on_stack.col_crend(1);
+    assert(*it_col4 == 7);
+    
+
     assert(mat_on_stack3 != mat_on_stack);
     lal::matrix<int, 3, 3> mat_on_stack4(mat_on_stack);
     mat_on_stack4.swap(mat_on_stack3);
@@ -137,7 +239,7 @@ void test_matrix_on_stack()
     static_assert(mat_on_stack.size() == 9);
     static_assert(mat_on_stack.max_size() == 9);
     static_assert(!mat_on_stack.empty());
-    
+       
     lal::matrix<int, 3, 3, true> mat_on_stack5;
     lal::matrix<int, 3, 3, true> mat_on_stack6 {{1}};
     lal::matrix<int, 3, 3, true> mat_on_stack7 {{1,2,3}};
@@ -274,6 +376,19 @@ void test_matrix_on_heap()
     assert(*mat_on_heap.begin()+1 == 2);
     int num = *mat_on_heap.begin();
     assert(num == 1);
+    auto it0 = mat_on_heap.begin(1);
+    assert(*it0 == 4);
+    it0 += 2;
+    assert(*it0 == 6);
+    it0--;
+    assert(*it0 == 5);
+    it0 -= 2;
+    assert(*it0 == 3);
+    it0++;
+    assert(*it0 == 4);
+    it0 = mat_on_heap.end(1);
+    assert(*it0 == 7);
+    
 
     i = 1;
     for (auto it = mat_on_heap.cbegin(); it < mat_on_heap.cend(); it++){
@@ -282,18 +397,41 @@ void test_matrix_on_heap()
     }
     assert(*mat_on_heap.cbegin() == 1);
     assert(*(mat_on_heap.cbegin() + 1) == 2);
+    auto it1 = mat_on_heap.cbegin(1);
+    assert(*it1 == 4);
+    it1 += 2;
+    assert(*it1 == 6);
+    it1--;
+    assert(*it1 == 5);
+    it1 -= 2;
+    assert(*it1 == 3);
+    it1++;
+    assert(*it1 == 4);
+    it1 = mat_on_heap.cend(1);
+    assert(*it1 == 7);
+ 
 
     i = 9;
-    auto it1 = mat_on_heap.rbegin();
-    it1++;
-    assert(*it1 == 8);
     for (auto it = mat_on_heap.rbegin(); it < mat_on_heap.rend(); it++){
         assert(*it == i);
         i--;
     }
     assert(*mat_on_heap.rbegin() == 9);
     assert(*(mat_on_heap.rbegin() + 2) == 7);
-    
+    auto it2 = mat_on_heap.rbegin(1);
+    assert(*it2 == 6);
+    it2 += 2;
+    assert(*it2 == 4);
+    it2--;
+    assert(*it2 == 5);
+    it2 -= 2;
+    assert(*it2 == 7);
+    it2++;
+    assert(*it2 == 6);
+    it2 = mat_on_heap.rend(1);
+    assert(*it2 == 3);
+
+
     i = 9;
     for (auto it = mat_on_heap.crbegin(); it < mat_on_heap.crend(); it++){
         assert(*it == i);
@@ -301,6 +439,19 @@ void test_matrix_on_heap()
     }
     assert(*mat_on_heap.crbegin() == 9);
     assert(*(mat_on_heap.crbegin() + 1) == 8);
+    auto it3 = mat_on_heap.crbegin(1);
+    assert(*it3 == 6);
+    it3 += 2;
+    assert(*it3 == 4);
+    it3--;
+    assert(*it3 == 5);
+    it3 -= 2;
+    assert(*it3 == 7);
+    it3++;
+    assert(*it3 == 6);
+    it3 = mat_on_heap.rend(1);
+    assert(*it3 == 3);
+
 
     //column iterator
     i = 0;
@@ -316,7 +467,20 @@ void test_matrix_on_heap()
     assert(*it_col1 == 6);
     it_col1 = mat_on_heap.col_end() - 3;
     assert(*it_col1 == 3);
+    it_col1 = mat_on_heap.col_begin(1);
+    assert(*it_col1 == 2);
+    it_col1 += 2;
+    assert(*it_col1 == 8);
+    it_col1--;
+    assert(*it_col1 == 5);
+    it_col1 -= 2;
+    assert(*it_col1 == 7);
+    it_col1++;
+    assert(*it_col1 == 2);
+    it_col1 = mat_on_heap.col_end(1);
+    assert(*it_col1 == 3);
     
+
     i = 0;
     for (auto it = mat_on_heap.col_cbegin(); it < mat_on_heap.col_cend(); it++){
         assert(*it == mat_on_heap[i%3][i/3]);
@@ -330,7 +494,20 @@ void test_matrix_on_heap()
     assert(*it_col2 == 6);
     it_col2 = mat_on_heap.col_cend() - 3;
     assert(*it_col2 == 3);
+    it_col2 = mat_on_heap.col_cbegin(1);
+    assert(*it_col2 == 2);
+    it_col2 += 2;
+    assert(*it_col2 == 8);
+    it_col2--;
+    assert(*it_col2 == 5);
+    it_col2 -= 2;
+    assert(*it_col2 == 7);
+    it_col2++;
+    assert(*it_col2 == 2);
+    it_col2 = mat_on_heap.col_cend(1);
+    assert(*it_col2 == 3);
     
+
 
     i = 8;
     auto it_col = mat_on_heap.col_rbegin();
@@ -348,7 +525,20 @@ void test_matrix_on_heap()
     assert(*it_col3 == 4);
     it_col3 = mat_on_heap.col_rend() - 3;
     assert(*it_col3 == 7);
+    it_col3 = mat_on_heap.col_rbegin(1);
+    assert(*it_col3 == 8);
+    it_col3 += 2;
+    assert(*it_col3 == 2);
+    it_col3--;
+    assert(*it_col3 == 5);
+    it_col3 -= 2;
+    assert(*it_col3 == 3);
+    it_col3++;
+    assert(*it_col3 == 8);
+    it_col3 = mat_on_heap.col_rend(1);
+    assert(*it_col3 == 7);
     
+
 
     i = 8;
     for (auto it = mat_on_heap.col_crbegin(); it < mat_on_heap.col_crend(); it++){
@@ -363,6 +553,20 @@ void test_matrix_on_heap()
     assert(*it_col4 == 4);
     it_col4 = mat_on_heap.col_crend() - 3;
     assert(*it_col4 == 7);
+    it_col4 = mat_on_heap.col_crbegin(1);
+    assert(*it_col4 == 8);
+    it_col4 += 2;
+    assert(*it_col4 == 2);
+    it_col4--;
+    assert(*it_col4 == 5);
+    it_col4 -= 2;
+    assert(*it_col4 == 3);
+    it_col4++;
+    assert(*it_col4 == 8);
+    it_col4 = mat_on_heap.col_crend(1);
+    assert(*it_col4 == 7);
+    
+
     assert(mat_on_heap3 != mat_on_heap);
     lal::matrix<int, 3, 3, false> mat_on_heap4(mat_on_heap);
     mat_on_heap4.swap(mat_on_heap3);
