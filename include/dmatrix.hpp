@@ -528,10 +528,13 @@ namespace lal {
         if (m1.cols() != Rows)
             throw std::logic_error {"matrix dimensions do not match"};
         dynamic_matrix<NumericType1> ret {m1.rows(), Cols, 0};
+        auto it_ret = ret.begin();
         for (index_t i {0}; i < m1.rows(); ++i) {
-            for (index_t j {0}; j < m2.cols(); ++j) {
-                for (index_t k {0}; k < m1.cols(); ++k)
-                    ret[i][j] += m1[i][k] * m2[k][j];
+            for (index_t j {0}; j < m2.cols(); ++j, ++it_ret) {
+                auto it_m1 = m1.begin(i);
+                auto it_m2 = m2.col_begin(j);
+                for (; it_m1 != m1.end(i); ++it_m1, ++it_m2)
+                    *it_ret += *it_m1 * *it_m2;
             }
         }
         return ret;
@@ -543,10 +546,13 @@ namespace lal {
         if (Cols != m2.rows())
             throw std::logic_error {"matrix dimensions do not match"};
         dynamic_matrix<NumericType1> ret {Rows, m2.cols(), 0};
+        auto it_ret = ret.begin();
         for (index_t i {0}; i < m1.rows(); ++i) {
-            for (index_t j {0}; j < m2.cols(); ++j) {
-                for (index_t k {0}; k < m1.cols(); ++k)
-                    ret[i][j] += m1[i][k] * m2[k][j];
+            for (index_t j {0}; j < m2.cols(); ++j, ++it_ret) {
+                auto it_m1 = m1.begin(i);
+                auto it_m2 = m2.col_begin(j);
+                for (; it_m1 != m1.end(i); ++it_m1, ++it_m2)
+                    *it_ret += *it_m1 * *it_m2;
             }
         }
         return ret;
