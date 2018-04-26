@@ -215,9 +215,10 @@ namespace lal {
     constexpr square_matrix<NumericType1, Size, OnStack>
     vector_cross_product(const vector<NumericType1, Size>& v1, const vector<NumericType2, Size>& v2) {
         square_matrix<NumericType1, Size, OnStack> ret;
-        for (index_t i {0}; i < Size; ++i) {
-            for (index_t j {0}; j < Size; ++j)
-                ret[i][j] = v1[i] * v2[j];
+        auto it_ret = ret.begin();
+        for (auto it_v1 = v1.begin(); it_v1 != v1.end(); ++it_v1) {
+            for (auto it_v2 = v2.begin(); it_v2 != v2.end(); ++it_v2, ++it_ret)
+                *it_ret = *it_v1 * *it_v2;
         }
         return ret;
     }
@@ -249,9 +250,12 @@ namespace lal {
     constexpr inline vector<NumericType1, Cols>
     operator*(const vector<NumericType1, Size>& v, const matrix<NumericType2, Size, Cols, OnStack>& m) {
         vector<NumericType1, Cols> ret {0};
-        for (index_t i {0}; i < Cols; ++i) {
-            for (index_t j {0}; j < Size; ++j)
-                ret[i] += v[j] * m[i][j];
+        auto it_ret = ret.begin();
+        for (index_t i {0}; i < Cols; ++i, ++it_ret) {
+            auto it_m = m.begin(i);
+            auto it_v = v.begin();
+            for (; it_v != v.end(); ++it_v, ++it_m)
+                *it_ret += *it_v * *it_m;
         }
         return ret;
     }
@@ -260,9 +264,12 @@ namespace lal {
     constexpr inline vector<NumericType1, Rows>
     operator*(const matrix<NumericType1, Rows, Size, OnStack>& m, const vector<NumericType2, Size>& v) {
         vector<NumericType1, Rows> ret {0};
-        for (index_t i {0}; i < Rows; ++i) {
-            for (index_t j {0}; j < Size; ++j)
-                ret[i] += m[i][j] * v[j];
+        auto it_ret = ret.begin();
+        for (index_t i {0}; i < Rows; ++i, ++it_ret) {
+            auto it_m = m.begin(i);
+            auto it_v = v.begin();
+            for (; it_v != v.end(); ++it_m, ++it_v)
+                *it_ret += *it_m * *it_v;
         }
         return ret;
     }
