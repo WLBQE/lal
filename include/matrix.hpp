@@ -271,7 +271,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator {_base.data(), 0, col};
+                return col_iterator {_base.data() + col, 0, col};
             else
                 return begin() + col;
         }
@@ -280,7 +280,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base.data(), 0, col};
+                return const_col_iterator {_base.data() + col, 0, col};
             else
                 return begin() + col;
         }
@@ -289,7 +289,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base.data(), 0, col};
+                return const_col_iterator {_base.data() + col, 0, col};
             else
                 return cbegin() + col;
         }
@@ -298,7 +298,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator {_base.data() + Rows * Cols, 0, col + 1};
+                return col_iterator {_base.data() + col + 1, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -307,7 +307,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base.data() + Rows * Cols, 0, col + 1};
+                return const_col_iterator {_base.data() + col + 1, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -316,7 +316,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base.data() + Rows * Cols, 0, col + 1};
+                return const_col_iterator {_base.data() + col + 1, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -676,7 +676,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator {_base->data(), 0, col};
+                return col_iterator {_base->data() + col, 0, col};
             else
                 return begin() + col;
         }
@@ -685,7 +685,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base->data(), 0, col};
+                return const_col_iterator {_base->data() + col, 0, col};
             else
                 return begin() + col;
         }
@@ -694,7 +694,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base->data(), 0, col};
+                return const_col_iterator {_base->data() + col, 0, col};
             else
                 return cbegin() + col;
         }
@@ -703,7 +703,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return col_iterator {_base->data() + Rows * Cols, 0, col + 1};
+                return col_iterator {_base->data() + col + 1, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -712,7 +712,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base->data() + Rows * Cols, 0, col + 1};
+                return const_col_iterator {_base->data() + col + 1, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -721,7 +721,7 @@ namespace lal {
             if (col >= Cols)
                 throw std::out_of_range {"column number out of range"};
             if constexpr (Rows > 1 && Cols > 1)
-                return const_col_iterator {_base->data() + Rows * Cols, 0, col + 1};
+                return const_col_iterator {_base->data() + col + 1, 0, col + 1};
             else
                 return begin() + col + 1;
         }
@@ -892,11 +892,11 @@ namespace lal {
         }
 
         constexpr bool operator==(const matrix_col_iterator& rhs) const noexcept {
-            return _ptr == rhs._ptr && _row == rhs._row && _col == rhs._col;
+            return _ptr == rhs._ptr;
         }
 
         constexpr bool operator==(const _other_it& rhs) const noexcept {
-            return _ptr == rhs._ptr && _row == rhs._row && _col == rhs._col;
+            return _ptr == rhs._ptr;
         }
 
         constexpr bool operator!=(const matrix_col_iterator& rhs) const noexcept {
@@ -1032,10 +1032,13 @@ namespace lal {
     operator*(const matrix<NumericType1, Rows1, Cols1, OnStack1>& m1,
               const matrix<NumericType2, Cols1, Cols2, OnStack2>& m2) {
         matrix<NumericType1, Rows1, Cols2, OnStack1> ret {0};
+        auto it_ret = ret.begin();
         for (index_t i {0}; i < Rows1; ++i) {
-            for (index_t j {0}; j < Cols2; ++j) {
-                for (index_t k {0}; k < Cols1; ++k)
-                    ret[i][j] += m1[i][k] * m2[k][j];
+            for (index_t j {0}; j < Cols2; ++j, ++it_ret) {
+                auto it_m1 = m1.begin(i);
+                auto it_m2 = m2.col_begin(j);
+                for (; it_m1 != m1.end(i); ++it_m1, ++it_m2)
+                    *it_ret += *it_m1 * *it_m2;
             }
         }
         return ret;

@@ -231,7 +231,13 @@ int main()
     it2 = dmat1.col_end() - 3; //fail
     std::cout << *it << "\n";
 
+    lal::matrix<int, 3, 3> true_a {{1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
+    for (auto i = 0; i < 3; ++i) {
+        for (auto it = true_a.col_begin(i); it != true_a.col_end(i); ++it)
+            std::cout << *it << ' ';
+        std::cout << '\n';
+    }
 
     return 0;
 }
