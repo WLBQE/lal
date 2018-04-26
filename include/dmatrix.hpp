@@ -398,6 +398,8 @@ namespace lal {
         }
 
         void erase_row(index_t pos) {
+            if (rows() == 0)
+                throw std::logic_error {"no rows to erase"};
             if (pos >= rows())
                 throw std::out_of_range {"invalid erase position"};
             _base.erase(_base.begin() + pos);
@@ -430,6 +432,8 @@ namespace lal {
 
     template <typename NumericType>
     void dynamic_matrix<NumericType>::erase_column(index_t pos) {
+        if (cols() == 0)
+            throw std::logic_error {"no columns to erase"};
         if (pos >= cols())
             throw std::out_of_range {"invalid erase position"};
         for (auto& row : _base)
