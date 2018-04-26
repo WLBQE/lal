@@ -1,0 +1,12 @@
+CXX=g++17
+CXXFLAGS=-std=c++17 -O2 -Wall -Wextra -pedantic
+
+INCLUDE = include/basics.hpp include/vector.hpp include/matrix.hpp include/iterators.hpp include/dmatrix.hpp \
+          include/constexpr_algorithm.hpp
+
+test: test_all.cpp $(INCLUDE)
+	$(CXX) -o test_all $(CXXFLAGS) test_all.cpp
+
+.PHONY: clean
+clean:
+	rm -f test_all
