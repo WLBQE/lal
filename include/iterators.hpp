@@ -9,7 +9,7 @@ namespace lal {
     template <typename Matrix, bool IsConst>
     class general_matrix_iterator {
         using _other_it = general_matrix_iterator<Matrix, !IsConst>;
-        using _ptr_type = std::conditional_t<IsConst, const Matrix* const, Matrix* const>;
+        using _ptr_type = std::conditional_t<IsConst, const Matrix*, Matrix*>;
         friend class general_matrix_iterator<Matrix, !IsConst>;
         _ptr_type _mat;
         index_t _row;
@@ -154,7 +154,7 @@ namespace lal {
     template <typename Matrix, bool IsConst>
     class general_matrix_col_iterator {
         using _other_it = general_matrix_col_iterator<Matrix, !IsConst>;
-        using _ptr_type = std::conditional_t<IsConst, const Matrix* const, Matrix* const>;
+        using _ptr_type = std::conditional_t<IsConst, const Matrix*, Matrix*>;
         friend class general_matrix_col_iterator<Matrix, !IsConst>;
         _ptr_type _mat;
         index_t _row;
