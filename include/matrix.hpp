@@ -240,7 +240,7 @@ namespace lal {
         constexpr const_iterator cend(index_t row) const {
             if (row >= Rows)
                 throw std::out_of_range {"row number out of range"};
-            return _base.cend() + (row + 1) * Cols;
+            return _base.cbegin() + (row + 1) * Cols;
         }
 
         constexpr reverse_iterator rbegin(index_t row) {
@@ -645,7 +645,7 @@ namespace lal {
         const_iterator cend(index_t row) const {
             if (row >= Rows)
                 throw std::out_of_range {"row number out of range"};
-            return _base->cend() + (row + 1) * Cols;
+            return _base->cbegin() + (row + 1) * Cols;
         }
 
         reverse_iterator rbegin(index_t row) {

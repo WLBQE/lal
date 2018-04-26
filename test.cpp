@@ -1089,5 +1089,11 @@ int main()
     test_vector();
     test_dynamic_matrix();
 
+    constexpr lal::matrix<int, 3, 3, true> mat123 {{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+    auto it123 = mat123.end(1);
+    auto it223 = mat123.cend(1);
+    std::cout << *it123 << "\n";
+    std::cout << *it223 << "\n";
+
     return 0;
 }
