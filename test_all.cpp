@@ -722,7 +722,7 @@ void test_vector(){
     assert(*it1 == 3);
     it1++;
     assert(*it1 == 4);
-    
+
     i = 1;
     for (auto it = vec3.cbegin(); it < vec3.cend(); it++){
         assert(*it == i);
@@ -740,6 +740,7 @@ void test_vector(){
     assert(*it2 == 3);
     it2++;
     assert(*it2 == 4);
+    
 
     i = 5;
     for (auto it = vec3.rbegin(); it < vec3.rend(); it++){
@@ -820,6 +821,12 @@ void test_vector(){
     assert(vec10[0] == 100);
     assert(vec11[0] == 1);
     assert(vec11.size() == 5);
+
+    constexpr lal::matrix<int, 5, 5, true> mat5 {{1}};
+    constexpr lal::vector<int, 1> vec13 {88};
+    constexpr lal::vector<int, 5> vec14 {24};
+    assert(vec12 * mat3 == vec13);
+    assert(mat5 * vec12 == vec14);
 }
 
 lal::dynamic_matrix<int> foo() {
@@ -884,6 +891,10 @@ void test_dynamic_matrix()
     assert(*it1 == 6);
     it1 = dmat.end() - 3;
     assert(*it1 == 7);
+    it1 = dmat.begin(1);
+    assert(*it1 == 4);
+    it1 = dmat.end(1);
+    assert(*it1 == 7);
 
 
     i = 1;
@@ -893,18 +904,49 @@ void test_dynamic_matrix()
     }
     assert(*dmat.cbegin() == 1);
     assert(*(dmat.cbegin() + 1) == 2);
-    
-    i = 9;
-    auto it2 = dmat.rbegin();
+    auto it2 = dmat.cbegin() + 8;
+    assert(*it2 == 9);
+    it2 -= 5;
+    assert(*it2 == 4);
     it2++;
-    assert(*it2 == 8);
+    assert(*it2 == 5);
+    it2 += 2;
+    assert(*it2 == 7);
+    it2--;
+    assert(*it2 == 6);
+    it2 = dmat.cend() - 3;
+    assert(*it2 == 7);
+    it2 = dmat.cbegin(1);
+    assert(*it2 == 4);
+    it2 = dmat.cend(1);
+    assert(*it2 == 7);
+
+
+    i = 9;
     for (auto it = dmat.rbegin(); it < dmat.rend(); it++){
         assert(*it == i);
         i--;
     }
     assert(*dmat.rbegin() == 9);
     assert(*(dmat.rbegin() + 2) == 7);
-    
+    auto it3 = dmat.rbegin() + 8;
+    assert(*it3 == 1);
+    it3 -= 5;
+    assert(*it3 == 6);
+    it3++;
+    assert(*it3 == 5);
+    it3 += 2;
+    assert(*it3 == 3);
+    it3--;
+    assert(*it3 == 4);
+    it3 = dmat.rend() - 3;
+    assert(*it3 == 3);
+    it3 = dmat.rbegin(1);
+    assert(*it3 == 6);
+    it3 = dmat.rend(1);
+    assert(*it3 == 3);
+
+
     i = 9;
     for (auto it = dmat.crbegin(); it < dmat.crend(); it++){
         assert(*it == i);
@@ -912,7 +954,25 @@ void test_dynamic_matrix()
     }
     assert(*dmat.crbegin() == 9);
     assert(*(dmat.crbegin() + 1) == 8);
-    
+    auto it4 = dmat.crbegin() + 8;
+    assert(*it4 == 1);
+    it4 -= 5;
+    assert(*it4 == 6);
+    it4++;
+    assert(*it4 == 5);
+    it4 += 2;
+    assert(*it4 == 3);
+    it4--;
+    assert(*it4 == 4);
+    it4 = dmat.crend() - 3;
+    assert(*it4 == 3);
+    it4 = dmat.crbegin(1);
+    assert(*it4 == 6);
+    it4 = dmat.crend(1);
+    assert(*it4 == 3);
+
+
+
     //column iterator
     i = 0;
     for (auto it = dmat.col_begin(); it < dmat.col_end(); it++){
@@ -933,7 +993,10 @@ void test_dynamic_matrix()
     assert(*it_col1 == 8);
     it_col1 = dmat.col_end() - 3;
     assert(*it_col1 == 3);
-
+    it_col1 = dmat.col_begin(1);
+    assert(*it_col1 == 2);
+    it_col1 = dmat.col_end(1);
+    assert(*it_col1 == 3);
 
     i = 0;
     for (auto it = dmat.col_cbegin(); it < dmat.col_cend(); it++){
@@ -948,7 +1011,12 @@ void test_dynamic_matrix()
     assert(*it_col2 == 6);
     it_col2 = dmat.col_cend() - 3;
     assert(*it_col2 == 3);
-    
+    it_col2 = dmat.col_cbegin(1);
+    assert(*it_col2 == 2);
+    it_col2 = dmat.col_cend(1);
+    assert(*it_col2 == 3);
+
+
 
     i = 8;
     auto it_col = dmat.col_rbegin();
@@ -966,7 +1034,12 @@ void test_dynamic_matrix()
     assert(*it_col3 == 4);
     it_col3 = dmat.col_rend() - 3;
     assert(*it_col3 == 7);
-    
+    it_col3 = dmat.col_rbegin(1);
+    assert(*it_col3 == 8);
+    it_col3 = dmat.col_rend(1);
+    assert(*it_col3 == 7);
+
+
 
     i = 8;
     for (auto it = dmat.col_crbegin(); it < dmat.col_crend(); it++){
@@ -982,7 +1055,11 @@ void test_dynamic_matrix()
     it_col4 = dmat.col_crend() - 3;
     assert(*it_col4 == 7);
     assert(dmat3 != dmat);
-   
+    it_col4 = dmat.col_crbegin(1);
+    assert(*it_col4 == 8);
+    it_col4 = dmat.col_crend(1);
+    assert(*it_col4 == 7);
+
     dmat4.swap(dmat3);
     assert(dmat3 == dmat);
     assert(dmat.size() == 9);
