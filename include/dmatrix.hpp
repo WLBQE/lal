@@ -108,7 +108,7 @@ namespace lal {
         }
 
         const_iterator begin() const noexcept {
-            return const_iterator {this, 0, 0};
+            return const_iterator(this, 0, 0);
         }
 
         const_iterator cbegin() const noexcept {

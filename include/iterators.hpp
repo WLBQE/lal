@@ -9,8 +9,9 @@ namespace lal {
     template <typename Matrix, bool IsConst>
     class general_matrix_iterator {
         using _other_it = general_matrix_iterator<Matrix, !IsConst>;
+        using _ptr_type = std::conditional_t<IsConst, const Matrix* const, Matrix* const>;
         friend class general_matrix_iterator<Matrix, !IsConst>;
-        Matrix* const _mat;
+        _ptr_type _mat;
         index_t _row;
         index_t _col;
 
@@ -21,11 +22,11 @@ namespace lal {
         typedef std::conditional_t<IsConst, typename Matrix::const_reference, typename Matrix::reference> reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        general_matrix_iterator(Matrix* mat, index_t row, index_t col) noexcept :
+        general_matrix_iterator(_ptr_type mat, index_t row, index_t col) noexcept :
                 _mat {mat}, _row {row}, _col {col} {}
 
         template <typename T, typename = std::enable_if_t<IsConst, T>>
-        constexpr general_matrix_iterator(const general_matrix_iterator<Matrix, !IsConst>& other) noexcept :
+        general_matrix_iterator(const general_matrix_iterator<Matrix, !IsConst>& other) noexcept :
                 _mat {other._mat}, _row {other._row}, _col {other._col} {}
 
         reference operator*() const {
@@ -153,8 +154,9 @@ namespace lal {
     template <typename Matrix, bool IsConst>
     class general_matrix_col_iterator {
         using _other_it = general_matrix_col_iterator<Matrix, !IsConst>;
+        using _ptr_type = std::conditional_t<IsConst, const Matrix* const, Matrix* const>;
         friend class general_matrix_col_iterator<Matrix, !IsConst>;
-        const Matrix* _mat;
+        _ptr_type _mat;
         index_t _row;
         index_t _col;
 
@@ -165,7 +167,7 @@ namespace lal {
         typedef std::conditional_t<IsConst, typename Matrix::const_reference, typename Matrix::reference> reference;
         typedef std::random_access_iterator_tag iterator_category;
 
-        general_matrix_col_iterator(const Matrix* mat, index_t row, index_t col) noexcept :
+        general_matrix_col_iterator(_ptr_type mat, index_t row, index_t col) noexcept :
                 _mat {mat}, _row {row}, _col {col} {}
 
         template <typename T, typename = std::enable_if_t<IsConst, T>>

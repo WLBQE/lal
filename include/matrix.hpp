@@ -25,7 +25,7 @@ namespace lal {
 
     template <typename NumericType1, typename NumericType2,
             index_t Rows1, index_t Cols1, index_t Cols2, bool OnStack1, bool OnStack2>
-    constexpr const matrix<NumericType1, Rows1, Cols2, OnStack1>
+    constexpr matrix<NumericType1, Rows1, Cols2, OnStack1>
     operator*(const matrix<NumericType1, Rows1, Cols1, OnStack1>& m1,
               const matrix<NumericType2, Cols1, Cols2, OnStack2>& m2);
 
