@@ -1070,7 +1070,7 @@ namespace lal {
         return ret;
     }
 
-    template <index_t Size, typename NumericType = double,
+    template <index_t Size, typename NumericType = int,
             bool OnStack = Size * Size * sizeof(NumericType) < _stack_threshold>
     constexpr matrix<NumericType, Size, Size, OnStack>
     make_identity(const NumericType& one = 1, const NumericType& zero = 0) noexcept(OnStack) {

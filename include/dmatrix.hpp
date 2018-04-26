@@ -581,7 +581,7 @@ namespace lal {
         return ret;
     }
 
-    template <typename NumericType>
+    template <typename NumericType = int>
     dynamic_matrix<NumericType>
     make_dynamic_identity(index_t size, const NumericType& one = 1, const NumericType& zero = 0) {
         dynamic_matrix<NumericType> ret {size, size, zero};
