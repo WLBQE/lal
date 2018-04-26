@@ -425,6 +425,7 @@ namespace lal {
             throw std::length_error {"invalid column length"};
         for (index_t i {0}; i < rows(); ++i)
             _base[i].insert(_base[i].begin() + pos, col[i]);
+        ++_cols;
     }
 
     template <typename NumericType>
@@ -433,6 +434,7 @@ namespace lal {
             throw std::out_of_range {"invalid erase position"};
         for (auto& row : _base)
             row.erase(row.begin() + pos);
+        --_cols;
     }
 
     template <typename NumericType1, typename NumericType2>
