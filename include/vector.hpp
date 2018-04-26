@@ -215,9 +215,10 @@ namespace lal {
     constexpr square_matrix<NumericType1, Size, OnStack>
     vector_cross_product(const vector<NumericType1, Size>& v1, const vector<NumericType2, Size>& v2) {
         square_matrix<NumericType1, Size, OnStack> ret;
-        for (index_t i {0}; i < Size; ++i) {
-            for (index_t j {0}; j < Size; ++j)
-                ret[i][j] = v1[i] * v2[j];
+        auto it_ret = ret.begin();
+        for (auto it_v1 = v1.begin(); it_v1 != v1.end(); ++it_v1) {
+            for (auto it_v2 = v2.begin(); it_v2 != v2.end(); ++it_v2, ++it_ret)
+                *it_ret = *it_v1 * *it_v2;
         }
         return ret;
     }
