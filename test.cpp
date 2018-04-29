@@ -240,7 +240,7 @@ void test_matrix_on_stack()
     static_assert(!mat_on_stack.empty());
        
     lal::matrix<int, 3, 3, true> mat_on_stack5;
-    lal::matrix<int, 3, 3, true> mat_on_stack6 {{1}};
+    lal::matrix<int, 3, 3, true> mat_on_stack6 {1};
     lal::matrix<int, 3, 3, true> mat_on_stack7 {{1,2,3}};
     lal::matrix<int, 3, 3, true> mat_on_stack8 {{0,1,2,3,4,5,6,7,8}};
     lal::matrix<int, 3, 3, true> mat_on_stack9 {{6,6,6,15,15,15,24,24,24}};
@@ -575,7 +575,7 @@ void test_matrix_on_heap()
     assert(!mat_on_heap.empty());
     
     lal::matrix<int, 3, 3, false> mat_on_heap5;
-    lal::matrix<int, 3, 3, false> mat_on_heap6 {{1}};
+    lal::matrix<int, 3, 3, false> mat_on_heap6 {1};
     lal::matrix<int, 3, 3, false> mat_on_heap7 {{1,2,3}};
     lal::matrix<int, 3, 3, false> mat_on_heap8 {{0,1,2,3,4,5,6,7,8}};
     lal::matrix<int, 3, 3, false> mat_on_heap9 {{6,6,6,15,15,15,24,24,24}};
@@ -687,11 +687,11 @@ void test_vector(){
     std::cout << vec3 <<"\n";
     static_assert(vec3.at(0) == 1);
     static_assert(vec3.at(3) == 4);
-    constexpr lal::matrix<int, 1, 3, true> mat {{1}};
+    constexpr lal::matrix<int, 1, 3, true> mat {1};
     constexpr lal::vector<int, 3> vec4 (mat);
     static_assert(vec4[0] == 1);
     static_assert(vec4[2] == 1);
-    lal::matrix<int, 1, 5, false> mat1 {{1}};
+    lal::matrix<int, 1, 5, false> mat1 {1};
     lal::vector<int, 5> vec5 (mat1);
     assert(vec5[0] == 1);
     assert(vec5[2] == 1);
@@ -821,7 +821,7 @@ void test_vector(){
     assert(vec11[0] == 1);
     assert(vec11.size() == 5);
 
-    constexpr lal::matrix<int, 5, 5, true> mat5 {{1}};
+    constexpr lal::matrix<int, 5, 5, true> mat5 {1};
     constexpr lal::vector<int, 1> vec13 {88};
     constexpr lal::vector<int, 5> vec14 {24};
     assert(vec12 * mat3 == vec13);
