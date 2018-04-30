@@ -357,7 +357,7 @@ namespace lal {
             return Cols;
         }
 
-        constexpr index_t size() const noexcept {
+        constexpr size_type size() const noexcept {
             return Rows * Cols;
         }
 
