@@ -409,7 +409,7 @@ namespace lal {
 
     template <typename NumericType1, typename NumericType2>
     inline bool operator==(const dynamic_matrix<NumericType1>& lhs, const dynamic_matrix<NumericType2>& rhs) {
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+        return lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     template <typename NumericType1, typename NumericType2>
