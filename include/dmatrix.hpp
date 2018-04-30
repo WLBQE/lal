@@ -342,7 +342,7 @@ namespace lal {
         }
 
         template <typename NumericType2>
-        dynamic_matrix& operator +=(dynamic_matrix<NumericType2>& m) {
+        dynamic_matrix& operator+=(dynamic_matrix<NumericType2>& m) {
             if (rows() != m.rows() || cols() != m.cols())
                 throw std::logic_error {"matrix dimensions do not match"};
             std::transform(begin(), end(), m.begin(), begin(),
@@ -351,7 +351,7 @@ namespace lal {
         }
 
         template <typename NumericType2>
-        dynamic_matrix& operator -=(dynamic_matrix<NumericType2>& m) {
+        dynamic_matrix& operator-=(dynamic_matrix<NumericType2>& m) {
             if (rows() != m.rows() || cols() != m.cols())
                 throw std::logic_error {"matrix dimensions do not match"};
             std::transform(begin(), end(), m.begin(), begin(),
