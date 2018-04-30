@@ -95,11 +95,11 @@ namespace lal {
             return _base[row][col];
         }
 
-        index_t rows() const {
+        index_t rows() const noexcept {
             return _base.size();
         }
 
-        index_t cols() const {
+        index_t cols() const noexcept {
             return _cols;
         }
 
@@ -323,15 +323,15 @@ namespace lal {
             _base.swap(other._base);
         }
 
-        size_t size() const {
+        size_t size() const noexcept {
             return rows() * cols();
         }
 
-        constexpr size_t max_size() const {
+        constexpr size_t max_size() const noexcept {
             return static_cast<size_t>(std::numeric_limits<difference_type>::max());
         }
 
-        bool empty() const {
+        bool empty() const noexcept {
             return rows() * cols() == 0;
         }
 
