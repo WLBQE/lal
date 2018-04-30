@@ -774,7 +774,7 @@ namespace lal {
             return Rows * Cols == 0;
         }
 
-        constexpr matrix operator-() const {
+        matrix operator-() const {
             matrix ret;
             algo::transform(begin(), end(), ret.begin(), [](const NumericType& num) -> NumericType { return -num; });
             return ret;
