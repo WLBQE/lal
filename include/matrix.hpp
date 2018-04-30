@@ -369,7 +369,7 @@ namespace lal {
             return Rows * Cols == 0;
         }
 
-        constexpr const matrix operator-() const {
+        constexpr matrix operator-() const {
             matrix ret;
             algo::transform(begin(), end(), ret.begin(), [](const NumericType& num) -> NumericType { return -num; });
             return ret;
