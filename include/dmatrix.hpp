@@ -377,8 +377,6 @@ namespace lal {
 
         template <typename NumericType2>
         dynamic_matrix& operator*=(dynamic_matrix<NumericType2>& m) {
-            if (rows() != cols())
-                throw std::logic_error {"operator *= can only be applied to square matrices"};
             *this = *this * m;
             return *this;
         }
